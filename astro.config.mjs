@@ -13,6 +13,8 @@ const deploymentHosts = new Set([
 // Catalog pages stay prerendered; order APIs and administration run on Vercel.
 export default defineConfig({
   output: 'static',
+  // Retain the existing inline-element spacing through the Astro 7 migration.
+  compressHTML: true,
   adapter: vercel(),
   security: {
     checkOrigin: true,

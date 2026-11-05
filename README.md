@@ -4,7 +4,7 @@ A bilingual English/Spanish seed catalog built with Astro and TypeScript, with s
 
 ## Local development
 
-Use Node.js 22.x and install the pinned dependencies:
+Use Node.js 22.19.0 or newer within the 22.x release line (`.nvmrc` pins the tested version, 22.23.4), and install the pinned dependencies:
 
 ```sh
 npm ci
@@ -23,9 +23,12 @@ npm run check
 npm test
 npm run build
 npm run verify:build
+npm run audit:security
 ```
 
 Build verification checks 57 public HTML pages, local links and assets, and legacy redirects in the Vercel routing configuration. Live backend verification scripts are for isolated development environments only; they create temporary order and authentication fixtures.
+
+The application uses Astro 7 and its Vercel adapter. Scoped dependency overrides keep the adapter's `glob` and `path-to-regexp` dependencies on patched releases until upstream updates those ranges. The security audit uses the official npm registry because some registry mirrors do not support the audit API. Commit `package-lock.json` with dependency changes and rerun these checks before deployment.
 
 ## Vercel deployment
 

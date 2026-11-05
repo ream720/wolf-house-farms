@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { NodeApp } from 'astro/app/node';
+import { createRequest } from 'astro/app/node';
 import type { IncomingMessage } from 'node:http';
 import config from '../astro.config.mjs';
 
 const host = 'wolf-house-farms.vercel.app';
 function proxyRequest(forwardedHost = host, origin = `https://${host}`) {
-  return NodeApp.createRequest({
+  return createRequest({
     url: '/admin/login/', method: 'POST', socket: {},
     headers: {
       host: 'localhost', 'x-forwarded-host': forwardedHost,
