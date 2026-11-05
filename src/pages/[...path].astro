@@ -1,0 +1,33 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+import Home from '../templates/Home.astro';
+import Catalog from '../templates/Catalog.astro';
+import Work from '../templates/Work.astro';
+import Detail from '../templates/Detail.astro';
+import StrainDetail from '../templates/StrainDetail.astro';
+import Story from '../templates/Story.astro';
+import Checkout from '../templates/Checkout.astro';
+import Info from '../templates/Info.astro';
+import Policy from '../templates/Policy.astro';
+import { policyUI } from '../data/policies';
+import { allRoutes, type Page } from '../lib/routes';
+import { ui, type Locale } from '../i18n/index';
+import { getStrain, getProject } from '../data/catalog';
+export function getStaticPaths() {
+  return allRoutes().map(r => ({ params: { path: r.path === '/' ? undefined : r.path.slice(1,-1) }, props: r }));
+}
+interface Props { locale: Locale; page: Page; slug: string }
+const { locale, page, slug } = Astro.props; const t = ui(locale);
+const titles: Record<Page, string> = { home: 'Wolf House Farms', genetics: t.genetics, strain: page === 'strain' ? getStrain(slug).name : '', work: t.work, project: page === 'project' ? getProject(slug).name : '', story: t.story, checkout: t.cart, confirmation: t.confirmationLabel, contact: t.contact, ...policyUI[locale] };
+---
+<SiteLayout locale={locale} page={page} slug={slug} title={titles[page]} description={page === 'strain' ? getStrain(slug).description[locale] : undefined}>
+  {page === 'home' && <Home locale={locale}/>}
+  {page === 'genetics' && <Catalog locale={locale}/>}
+  {page === 'work' && <Work locale={locale}/>}
+  {page === 'strain' && <StrainDetail locale={locale} slug={slug}/>}
+  {page === 'project' && <Detail locale={locale} slug={slug} kind={page}/>}
+  {page === 'story' && <Story locale={locale}/>}
+  {(page === 'checkout' || page === 'confirmation') && <Checkout locale={locale} confirmation={page === 'confirmation'}/>}
+  {page === 'contact' && <Info locale={locale} kind={page}/>}
+  {(page === 'terms' || page === 'privacy' || page === 'ordering' || page === 'faq') && <Policy locale={locale} kind={page}/>}
+</SiteLayout>

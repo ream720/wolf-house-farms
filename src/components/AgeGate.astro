@@ -1,0 +1,19 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { pathFor, type Page } from '../lib/routes';
+import Agreement from './Agreement.astro';
+import { policyUI } from '../data/policies';
+interface Props { locale: Locale; page: Page; slug: string }
+const {locale,page,slug} = Astro.props; const t=ui(locale);
+---
+<dialog open class="age-gate" aria-labelledby="age-heading" aria-describedby="age-description">
+  <div class="age-card"><div class="age-top"><span class="eyebrow">Wolf House Farms</span><div class="language-switch"><a data-language="en" lang="en" href={pathFor('en',page,slug)} aria-current={locale === 'en' ? 'true' : undefined}>EN</a><span>/</span><a data-language="es" lang="es" href={pathFor('es',page,slug)} aria-current={locale === 'es' ? 'true' : undefined}>ES</a></div></div>
+  <img class="age-mascots" src="/images/wolf-xolo.webp" alt={t.mascotAlt} width="1536" height="1024" fetchpriority="high"/>
+  <p class="eyebrow age-welcome">{t.welcome} / 21+</p><h2 id="age-heading">{t.ageTitle}</h2><p id="age-description">{t.ageBody}</p>
+  <form data-age-form>
+    <Agreement locale={locale} context="age"/>
+    <div class="age-actions"><button type="submit" class="button" data-age-accept>{policyUI[locale].agree}</button><button type="button" class="button button-outline" data-age-decline>{t.ageNo}</button></div>
+  </form>
+  <p data-age-denied hidden role="alert" tabindex="-1">{t.ageDenied}</p><noscript><p>{t.ageNoScript}</p></noscript>
+  </div>
+</dialog>

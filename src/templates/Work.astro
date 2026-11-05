@@ -1,0 +1,8 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { projects } from '../data/catalog';
+import ProjectCard from '../components/ProjectCard.astro';
+interface Props { locale: Locale } const { locale } = Astro.props; const t = ui(locale);
+---
+<section class="page-intro wrap"><p class="eyebrow">{t.workEyebrow}</p><h1>{t.workTitle}</h1><p class="page-lead">{t.workIntro}</p></section>
+<section class="wrap section-bottom"><h2 class="sr-only">{t.work}</h2><div class="project-grid">{projects.map(project => <ProjectCard project={project} locale={locale}/>)}</div></section>

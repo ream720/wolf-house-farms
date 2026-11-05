@@ -1,0 +1,83 @@
+import type { Locale } from '../i18n/index.ts';
+
+// Bump whenever the policies or agreement change. Keep prior versions in source history.
+export const POLICY_VERSION = '2026-11-05';
+export const policyPages = ['terms', 'privacy', 'ordering', 'faq'] as const;
+export const policyUI = {
+  en: {
+    terms: 'Terms & Conditions', privacy: 'Privacy Policy', ordering: 'Shipping & Returns', faq: 'FAQ',
+    updated: 'Last updated: November 5, 2026', back: 'Return to age confirmation',
+    ageAgreement: 'I certify that I am 21 years of age or older. I have read and agree to the',
+    checkoutAgreement: 'I certify that I am 21 years of age or older, that I am legally allowed to purchase cannabis seeds in my jurisdiction, and that I will not use these seeds in violation of any applicable laws. I have read and agree to the',
+    and: 'and', agree: 'Agree & enter',
+    souvenir: 'Seeds are sold as collectible souvenirs, for preservation of genetics, and for novelty purposes only. Check all applicable laws before purchasing or germinating.',
+    disclaimer: 'This information is for compliance and informational purposes only and does not constitute legal advice. Please consult with a licensed attorney in your state to ensure full compliance.',
+  },
+  es: {
+    terms: 'Términos y condiciones', privacy: 'Política de privacidad', ordering: 'Envíos y devoluciones', faq: 'Preguntas frecuentes',
+    updated: 'Última actualización: 5 de noviembre de 2026', back: 'Volver a la confirmación de edad',
+    ageAgreement: 'Certifico que tengo 21 años o más. He leído y acepto los',
+    checkoutAgreement: 'Certifico que tengo 21 años o más, que puedo comprar semillas de cannabis legalmente en mi jurisdicción y que no las utilizaré infringiendo ninguna ley aplicable. He leído y acepto los',
+    and: 'y la', agree: 'Aceptar y entrar',
+    souvenir: 'Las semillas se venden únicamente como artículos de colección, para la conservación genética y como artículos de novedad. Consulta las leyes aplicables antes de comprar o germinar.',
+    disclaimer: 'Esta información se ofrece únicamente con fines de cumplimiento e información y no constituye asesoramiento jurídico. Consulta con un abogado autorizado en tu estado para asegurar el pleno cumplimiento de la ley.',
+  },
+} satisfies Record<Locale, Record<string, string>>;
+
+type Section = { title: string; body: string };
+export const termsSections: Record<Locale, Section[]> = {
+  en: [
+    { title: '1. Collectible souvenirs & genetic preservation', body: 'Cannabis seeds sold by Wolf House Farms are sold as collectible souvenirs, for preservation of genetics, and for novelty purposes only. Germination and cultivation may be illegal in your jurisdiction. Wolf House Farms does not condone, encourage, or promote germination or cultivation where prohibited by law.' },
+    { title: '2. Age restriction', body: 'You represent and warrant that you are at least 21 years of age. We reserve the right to verify your age, refuse service, or cancel an order if we suspect you are under 21. Resale of products purchased from us to anyone under 21 is prohibited. Website age confirmation is a self-attestation and does not verify identity.' },
+    { title: '3. Compliance with law', body: 'Before purchasing, possessing, germinating, or using seeds, you are responsible for checking and complying with all applicable local, state, and federal laws. By placing an order, you affirm that your purchase is lawful in your jurisdiction. A purchase does not grant permission to germinate or cultivate. We do not sell or ship where prohibited by applicable law.' },
+    { title: '4. No germination guarantee or growing advice', body: 'We do not guarantee germination and do not provide germination instructions or cultivation advice. Any information on our website, blog, or packaging is for educational and informational purposes only.' },
+    { title: '5. No medical advice or claims', body: 'Our seeds are not intended to diagnose, treat, cure, or prevent any disease. We make no medical claims. Website content is not medical advice. Consult a licensed physician before using any cannabis product.' },
+    { title: '6. Orders, payment & right to refuse', body: 'We reserve the right to refuse a sale, cancel an order, or limit quantities at our discretion, subject to applicable law. Submitting a reservation does not charge you or guarantee stock. Payment requests and verification are handled manually. Wait for our payment request before sending funds. Save your on-screen confirmation; automatic confirmation emails are not sent.' },
+    { title: '7. Shipping & returns', body: 'The Shipping & Returns policy forms part of these terms. Orders are for US delivery only, where lawful. Seed sales are final once shipped, subject to the damaged-on-arrival process and any rights required by applicable law.' },
+    { title: '8. Responsibility & limitation of liability', body: 'You assume responsibility for your purchase and any unlawful use of seeds. To the extent permitted by applicable law, Wolf House Farms is not liable for illegal use of seeds purchased from this website. Nothing in these terms excludes liability or consumer rights that cannot lawfully be excluded.' },
+  ],
+  es: [
+    { title: '1. Artículos de colección y conservación genética', body: 'Las semillas de cannabis de Wolf House Farms se venden únicamente como artículos de colección, para la conservación genética y como artículos de novedad. La germinación y el cultivo pueden ser ilegales en tu jurisdicción. Wolf House Farms no aprueba, fomenta ni promueve la germinación o el cultivo donde la ley los prohíbe.' },
+    { title: '2. Restricción de edad', body: 'Declaras y garantizas que tienes al menos 21 años. Nos reservamos el derecho de verificar tu edad, rechazar el servicio o cancelar un pedido si sospechamos que eres menor de 21 años. Se prohíbe revender nuestros productos a menores de 21 años. La confirmación de edad del sitio es una declaración del visitante y no verifica su identidad.' },
+    { title: '3. Cumplimiento de la ley', body: 'Antes de comprar, poseer, germinar o utilizar semillas, te corresponde consultar y cumplir todas las leyes locales, estatales y federales aplicables. Al realizar un pedido, afirmas que la compra es legal en tu jurisdicción. Comprar no otorga permiso para germinar o cultivar. No vendemos ni enviamos donde lo prohíba la ley aplicable.' },
+    { title: '4. Sin garantía de germinación ni consejos de cultivo', body: 'No garantizamos la germinación ni proporcionamos instrucciones de germinación o consejos de cultivo. La información del sitio, blog o embalaje tiene únicamente fines educativos e informativos.' },
+    { title: '5. Sin asesoramiento ni afirmaciones médicas', body: 'Nuestras semillas no están destinadas a diagnosticar, tratar, curar ni prevenir enfermedades. No hacemos afirmaciones médicas. El contenido del sitio no es asesoramiento médico. Consulta a un médico autorizado antes de utilizar cualquier producto de cannabis.' },
+    { title: '6. Pedidos, pagos y derecho a rechazar ventas', body: 'Nos reservamos el derecho de rechazar ventas, cancelar pedidos o limitar cantidades a nuestra discreción, conforme a la ley aplicable. Enviar una reserva no genera un cobro ni garantiza existencias. Las solicitudes y verificaciones de pago se gestionan manualmente. Espera nuestra solicitud antes de pagar. Guarda la confirmación en pantalla; no se envían correos automáticos de confirmación.' },
+    { title: '7. Envíos y devoluciones', body: 'La política de Envíos y devoluciones forma parte de estos términos. Solo se aceptan pedidos para entrega en EE. UU., donde sea legal. Las ventas de semillas son finales una vez enviadas, con la excepción del procedimiento para productos dañados al llegar y los derechos exigidos por la ley aplicable.' },
+    { title: '8. Responsabilidad y limitación de responsabilidad', body: 'Asumes la responsabilidad de tu compra y de cualquier uso ilegal de las semillas. En la medida permitida por la ley, Wolf House Farms no será responsable del uso ilegal de semillas compradas en este sitio. Estos términos no excluyen responsabilidades ni derechos del consumidor que legalmente no puedan excluirse.' },
+  ],
+};
+
+export const shippingSections: Record<Locale, Section[]> = {
+  en: [
+    { title: 'US delivery only', body: 'Wolf House Farms accepts orders for delivery within the United States to adults 21 years of age or older, only where the sale, shipment, and possession of seeds are lawful. We do not ship internationally. Orders with delivery addresses outside the United States will be canceled and refunded if payment has been collected. A US address alone does not establish that a shipment is lawful.' },
+    { title: 'Packaging & delivery', body: 'Orders are shipped in discreet, odor-proof packaging with no external indication of contents. Available shipping charges are shown at checkout. We do not promise a dispatch or delivery date unless confirmed for your order.' },
+    { title: 'Local laws & forwarding', body: 'It is your responsibility to understand applicable laws before purchasing, germinating, or cultivating seeds. Wolf House Farms does not promote or condone illegal cultivation. If you independently forward a delivery outside the US, you assume the risk of customs seizure. We do not offer reshipment for customs seizures. Forwarding does not change our US-only shipping policy.' },
+    { title: 'Final sales & damaged deliveries', body: 'To maintain genetic integrity, seed sales are final once the product has shipped. We do not accept returns or exchanges unless the product arrives damaged, subject to rights required by applicable law. Report damage within 48 hours of delivery with photos and your order reference, using the contact channel supplied with your order or payment request. Keep the product and packaging while your claim is reviewed.' },
+    { title: 'Payment & confirmation', body: 'No payment is taken at checkout. Wolf House Farms coordinates payment manually using your selected method and account. Wait for the team’s payment request before paying. Payment is verified before fulfillment. Save or print your on-screen confirmation because automatic confirmation emails are not sent.' },
+  ],
+  es: [
+    { title: 'Solo entregas en Estados Unidos', body: 'Wolf House Farms acepta pedidos para entrega dentro de Estados Unidos a personas de 21 años o más, únicamente donde la venta, el envío y la posesión de semillas sean legales. No realizamos envíos internacionales. Los pedidos con dirección de entrega fuera de EE. UU. se cancelarán y se reembolsarán si ya se ha cobrado el pago. Una dirección estadounidense no demuestra por sí sola que el envío sea legal.' },
+    { title: 'Embalaje y entrega', body: 'Los pedidos se envían en embalaje discreto, a prueba de olores y sin indicación externa del contenido. Las tarifas de envío disponibles se muestran al finalizar la reserva. No prometemos fechas de expedición ni de entrega salvo confirmación para tu pedido.' },
+    { title: 'Leyes locales y reenvío', body: 'Te corresponde conocer las leyes aplicables antes de comprar, germinar o cultivar semillas. Wolf House Farms no fomenta ni aprueba el cultivo ilegal. Si reenvías por tu cuenta un paquete fuera de EE. UU., asumes el riesgo de incautación aduanera. No ofrecemos un nuevo envío en caso de incautación. El reenvío no modifica nuestra política de envíos solo dentro de EE. UU.' },
+    { title: 'Ventas finales y productos dañados', body: 'Para mantener la integridad genética, las ventas de semillas son finales una vez enviado el producto. No aceptamos devoluciones ni cambios salvo que llegue dañado, sin perjuicio de los derechos exigidos por la ley. Comunica el daño dentro de las 48 horas siguientes a la entrega, con fotos y la referencia del pedido, mediante el canal de contacto facilitado con tu pedido o solicitud de pago. Conserva el producto y el embalaje mientras se revisa la reclamación.' },
+    { title: 'Pago y confirmación', body: 'No se cobra al enviar la reserva. Wolf House Farms coordina el pago manualmente mediante el método y la cuenta seleccionados. Espera la solicitud del equipo antes de pagar. El pago se verifica antes de preparar el envío. Guarda o imprime la confirmación en pantalla porque no se envían correos automáticos de confirmación.' },
+  ],
+};
+
+export const faqSections: Record<Locale, Section[]> = {
+  en: [
+    { title: 'Can I germinate these seeds in my state?', body: 'Only if germination and cultivation are lawful for you under all applicable laws. Age, licensing, medical authorization, plant limits, and local restrictions may apply. Being 21 or buying seeds does not by itself authorize cultivation. Laws change; check current official state and local guidance and consult a licensed attorney before germinating. We do not maintain a list of states where cultivation is permitted.' },
+    { title: 'What are these seeds sold for?', body: 'Collectible souvenirs, preservation of genetics, and novelty purposes only. We do not provide germination instructions, growing advice, or a germination guarantee, and we make no medical claims.' },
+    { title: 'Do you ship internationally?', body: 'No. Delivery is within the United States only, where lawful, to adults 21 and older. International delivery orders will be canceled and refunded if payment has been collected.' },
+    { title: 'Can I return seeds?', body: 'Seed sales are final once shipped, subject to applicable consumer rights. For a product that arrives damaged, report it within 48 hours of delivery with photos and your order reference. See Shipping & Returns for the full process.' },
+    { title: 'Will I receive an automatic confirmation email?', body: 'No. Save, screenshot, or print the confirmation shown after submitting your reservation. Wait for Wolf House Farms to coordinate your payment request before sending funds.' },
+  ],
+  es: [
+    { title: '¿Puedo germinar estas semillas en mi estado?', body: 'Solo si la germinación y el cultivo son legales para ti conforme a todas las leyes aplicables. Pueden existir requisitos de edad, licencia o autorización médica, límites de plantas y restricciones locales. Tener 21 años o comprar semillas no autoriza por sí solo el cultivo. Las leyes cambian; consulta la información oficial estatal y local vigente y a un abogado autorizado antes de germinar. No mantenemos una lista de estados donde se permita cultivar.' },
+    { title: '¿Para qué se venden estas semillas?', body: 'Únicamente como artículos de colección, para la conservación genética y como artículos de novedad. No proporcionamos instrucciones de germinación, consejos de cultivo ni garantía de germinación, y no hacemos afirmaciones médicas.' },
+    { title: '¿Realizan envíos internacionales?', body: 'No. Solo entregamos dentro de Estados Unidos, donde sea legal, a personas de 21 años o más. Los pedidos internacionales se cancelarán y se reembolsarán si ya se ha cobrado el pago.' },
+    { title: '¿Puedo devolver semillas?', body: 'Las ventas de semillas son finales una vez enviadas, sin perjuicio de los derechos legales del consumidor. Si un producto llega dañado, comunícalo dentro de las 48 horas siguientes a la entrega, con fotos y la referencia del pedido. Consulta el procedimiento completo en Envíos y devoluciones.' },
+    { title: '¿Recibiré un correo automático de confirmación?', body: 'No. Guarda, captura o imprime la confirmación que aparece después de enviar tu reserva. Espera a que Wolf House Farms coordine la solicitud de pago antes de enviar dinero.' },
+  ],
+};

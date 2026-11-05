@@ -1,0 +1,8 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import Icon from '../components/Icon.astro';
+interface Props { locale: Locale } const { locale } = Astro.props; const t = ui(locale);
+---
+<section class="catalog-hero roots-hero wrap"><div><p class="eyebrow">{t.storyEyebrow}</p><h1>{t.storyTitle}</h1><p class="page-lead">{t.storyBody}</p><a class="button" href={pathFor(locale,'genetics')}>{t.explore}<Icon/></a></div><figure class="companion-art"><img src="/images/wolf-xolo.webp" alt={t.mascotAlt} width="1536" height="1024"/></figure></section>
+<section class="wrap roots-values section-bottom"><h2>{t.storyHeading}</h2><div>{[['value1','value1Body'],['value2','value2Body'],['value3','value3Body']].map(([title,body])=><article><h3>{t[title as keyof typeof t]}</h3><p>{t[body as keyof typeof t]}</p></article>)}</div></section>

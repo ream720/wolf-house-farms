@@ -1,0 +1,14 @@
+---
+import type { Project } from '../data/catalog';
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import Icon from './Icon.astro';
+interface Props { project: Project; locale: Locale }
+const { project: p, locale } = Astro.props;
+const t = ui(locale);
+---
+<a class={`project-card project-${p.id}`} href={pathFor(locale,'project',p.id)}>
+  <div class="project-image"><img src={`/images/${p.image}.webp`} alt="" width="768" height="960" loading="lazy"/></div>
+  <div class="project-meta"><span class="eyebrow">{t[p.kind]}</span><Icon/></div>
+  <h3>{p.name}</h3><p>{p.intro[locale]}</p>
+</a>

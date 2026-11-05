@@ -1,0 +1,23 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { authClient, configured, sameOrigin, database, rateKey } from '../../lib/server/backend';
+export const prerender = false;
+let error = ''; let email = '';
+if (Astro.request.method === 'POST') {
+  try {
+    sameOrigin(Astro.request);
+    const form = await Astro.request.formData();
+    email = String(form.get('email') || '').trim().slice(0,254);
+    const password = String(form.get('password') || '');
+    const {data: allowed,error: limitError} = await database().rpc('whf_check_rate',{p_key:`login:${await rateKey(Astro)}`,p_limit:20});
+    if (limitError || !allowed) throw new Error('Too many sign-in attempts. Please try again later.');
+    const auth = authClient(Astro);
+    const {data: login,error: loginError} = await auth.auth.signInWithPassword({email,password});
+    if (loginError) throw new Error('Could not sign in. Check your email and password.');
+    const {data: admin,error: accessError} = await database().from('whf_admins').select('user_id').eq('user_id',login.user!.id).maybeSingle();
+    if (accessError || !admin) { await auth.auth.signOut(); throw new Error('This account does not have WHF admin access.'); }
+    return Astro.redirect('/admin/orders/',303);
+  } catch (failure) { error = failure instanceof Error ? failure.message : 'Could not sign in. Please try again.'; }
+}
+---
+<AdminLayout title="Sign in"><section class="admin-login admin-panel"><p class="eyebrow">WHF / Administration</p><h1>Welcome back.</h1><p>Sign in to manage orders, payment requests, and fulfillment.</p>{configured() ? <form method="post"><label>Email<input type="email" name="email" required autocomplete="username" maxlength="254" value={email}/></label><label>Password<input type="password" name="password" required autocomplete="current-password" maxlength="256"/></label>{error && <p role="alert" class="form-error">{error}</p>}<button class="button" type="submit">Sign in</button><p class="admin-help">Access is limited to accounts approved by Wolf House Farms. Contact your site administrator for access or a password reset.</p></form> : <p class="admin-notice" role="status">Order management is being set up. Sign-in will be available once the order service is connected.</p>}</section></AdminLayout>

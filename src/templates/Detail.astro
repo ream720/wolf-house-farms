@@ -1,0 +1,20 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import { getProject, getStrain, strains } from '../data/catalog';
+import StrainCard from '../components/StrainCard.astro';
+import Icon from '../components/Icon.astro';
+interface Props { locale: Locale; slug: string; kind: 'strain' | 'project' }
+const { locale, slug, kind } = Astro.props; const t = ui(locale);
+const strain = kind === 'strain' ? getStrain(slug) : undefined;
+const project = getProject(strain?.project || slug);
+const related = strains.filter(s => s.project === project.id && s.id !== strain?.id);
+---
+<section class="detail-hero wrap">
+  <div class="detail-copy"><a class="back-link" href={pathFor(locale, strain ? 'genetics' : 'work')}>← {strain ? t.backLibrary : t.backWork}</a><p class="eyebrow">{strain ? project.name : t[project.kind]}</p><h1>{strain ? strain.name : project.name}</h1><p class="page-lead">{strain ? strain.description[locale] : project.title[locale]}</p>
+    {strain ? <dl class="fact-list"><div><dt>{t.lineage}</dt><dd>{strain.suppliedLineage}</dd></div><div><dt>{t.status}</dt><dd>{t[strain.status]}</dd></div><div><dt>{t.line}</dt><dd><a href={pathFor(locale,'project',project.id)}>{project.name} ↗</a></dd></div></dl> : <p>{project.intro[locale]}</p>}
+  </div>
+  <figure class="detail-image"><img src={`/images/${project.image}.webp`} alt={locale === 'en' ? `Illustration for ${project.name}.` : `Ilustración para ${project.name}.`} width="768" height="960"/></figure>
+</section>
+<section class="detail-story wrap section"><div><p class="eyebrow">{strain ? t.overview : t.projectGoal}</p><h2>{strain ? project.title[locale] : project.name}</h2></div><div><p>{strain ? strain.description[locale] : project.goal[locale]}</p>{!strain && <><h3>{t.projectApproach}</h3><p>{project.approach[locale]}</p></>}</div></section>
+<section class="wrap section-bottom"><div class="section-heading"><h2>{strain ? t.related : t.projectEntries}</h2><a class="text-link" href={pathFor(locale,'genetics')}>{t.allGenetics}<Icon/></a></div><div class="strain-grid">{related.map(s => <StrainCard strain={s} locale={locale}/>)}</div></section>

@@ -1,0 +1,48 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminOrderItem from '../../../components/AdminOrderItem.astro';
+import { requireAdmin } from '../../../lib/server/backend';
+import { paymentMethods,paymentStatuses,fulfillmentStatuses,OrderError,type Order } from '../../../lib/orders';
+import { offers,getStrain,isOfferAvailable } from '../../../data/catalog';
+import { money } from '../../../i18n/index';
+export const prerender = false;
+let db;
+try { ({db} = await requireAdmin(Astro)); }
+catch(error) { if (error instanceof OrderError && error.status === 403) return new Response('WHF admin access required.',{status:403,headers:{'Cache-Control':'no-store'}}); return Astro.redirect('/admin/login/',302); }
+const {data,error} = await db.from('whf_orders').select('*').eq('id',Astro.params.id || '').maybeSingle();
+if (error || !data) return new Response('Order not found.',{status:404,headers:{'Cache-Control':'no-store'}});
+const order = data as Order;
+const {data:events,error:historyError} = await db.from('whf_order_events').select('id,created_at,actor,before_details,after_details').eq('order_id',order.id).order('created_at',{ascending:false}).limit(100);
+const label = (s:string) => s.replaceAll('_',' ');
+const shipped = ['shipped','delivered'].includes(order.fulfillment_status);
+const lineOptions = [...order.items,...offers.filter(o=>isOfferAvailable(o) && !order.items.some(i=>i.id===o.id)).map(o=>({id:o.id,name:getStrain(o.strain).name,quantity:1,unitCents:o.cents,pack:'10 seeds per pack'}))];
+const maxQuantity = (item:typeof lineOptions[number]) => Math.max(item.quantity,offers.find(o=>o.id===item.id)?.max || 0);
+const changed = (before: Record<string,unknown> | null, after: Record<string,unknown>) => !before ? 'Order received' : Object.keys(after).filter(k=>!['version','updated_at'].includes(k) && JSON.stringify(before[k])!==JSON.stringify(after[k])).map(label).join(', ') || 'Order saved';
+---
+<AdminLayout title={`Order ${order.reference}`} signedIn>
+<a class="text-link" href="/admin/orders/">← All orders</a>
+<div class="admin-page-heading"><div><p class="eyebrow">Order details</p><h1 class="admin-order-title">{order.reference}</h1><p>Placed {new Date(order.created_at).toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'long',timeStyle:'short'})} ET · Customer language: {order.locale==='es'?'Spanish':'English'}</p></div><button class="button button-outline" data-print-order>Print packing slip</button></div>
+<p role="status" aria-live="polite" data-save-status></p>
+<form data-admin-order data-id={order.id} data-version={order.version} class="admin-order-grid">
+<div class="admin-order-main"><section class="admin-panel"><h2>Contact & delivery</h2>{shipped && <p class="admin-help">Delivery details and items are locked after shipping.</p>}<div class="form-grid">{Object.entries({name:'Full name',email:'Email',address:'Street address',city:'City',state:'State (US code)',zip:'ZIP code'}).map(([key,title])=><label class:list={[{ 'full-field': ['name','email','address'].includes(key) }]}>{title}<input name={key} value={order.customer[key as keyof typeof order.customer]} required readonly={shipped} type={key==='email'?'email':'text'} maxlength={key==='state'?2:key==='zip'?10:key==='email'?254:160}/></label>)}</div><p class="admin-help">United States</p></section>
+<section class="admin-panel">
+  <h2>Order items</h2>
+  <p class="admin-help">These are the items in this order. Existing lines keep their agreed price.</p>
+  <div data-order-lines>{order.items.map(item=><AdminOrderItem item={item} max={maxQuantity(item)} locked={shipped}/>)}</div>
+  {!shipped && <>
+    <div class="admin-add-item" data-add-item-controls hidden>
+      <label>Add another selection<select data-add-item-select><option value="">Choose an item to add</option>{lineOptions.map(item=><option value={item.id}>{item.name} · {money(item.unitCents,'en')} / pack</option>)}</select></label>
+      <button type="button" class="button button-outline" data-add-order-item disabled>Add item</button>
+    </div>
+    {lineOptions.map(item=><template data-order-line-template={item.id}><AdminOrderItem item={{...item,quantity:1}} max={maxQuantity(item)}/></template>)}
+  </>}
+  <dl class="totals"><div><dt>Subtotal</dt><dd data-admin-subtotal>{money(order.subtotal,'en')}</dd></div><div><dt>US shipping</dt><dd>{money(order.shipping,'en')}</dd></div><div class="grand-total"><dt>Total · USD</dt><dd data-admin-total data-shipping={order.shipping}>{money(order.total,'en')}</dd></div></dl>
+  <p class="admin-help">If the total changes after a payment request, update the invoice manually with the customer.</p>
+</section>
+<section class="admin-panel"><h2>Internal notes</h2><label><span class="sr-only">Internal notes</span><textarea name="notes" rows="5" maxlength="5000" placeholder="Packing notes, customer requests, or payment follow-up">{order.notes}</textarea></label><p class="admin-help">Only WHF administrators can see these notes.</p></section></div>
+<aside><section class="admin-panel"><h2>Payment request</h2><label>Payment method<select name="paymentMethod" required>{Object.entries(paymentMethods).map(([value,name])=><option value={value} selected={value===order.payment.method}>{name}</option>)}</select></label><label>Username, email, or phone<input name="paymentAccount" value={order.payment.account} required maxlength="254"/></label><label>Payment status<select name="payment_status">{paymentStatuses.map(s=><option value={s} selected={s===order.payment_status}>{label(s)}</option>)}</select></label><p class="admin-help">Send the invoice or payment request in the selected payment app. Mark it requested after sending; mark paid only after verifying receipt. For Apple Pay, coordinate through Apple Cash / Messages using the supplied contact.</p></section>
+<section class="admin-panel"><h2>Fulfillment</h2><label>Status<select name="fulfillment_status">{fulfillmentStatuses.map(s=><option value={s} selected={s===order.fulfillment_status}>{label(s)}</option>)}</select></label><label>Carrier<input name="carrier" value={order.carrier} maxlength="100" placeholder="USPS, UPS, FedEx…"/></label><label>Tracking number<input name="tracking" value={order.tracking} maxlength="160"/></label><p class="admin-help">Confirm payment before packing. Add tracking before marking shipped or delivered. Cancel orders here to retain their history.</p></section><div class="admin-save"><button class="button" type="submit" data-save-order>Save changes</button><a class="text-link" href={Astro.url.pathname}>Reload saved order</a></div></aside></form>
+<section class="admin-panel admin-history"><h2>Order history</h2>{historyError ? <p role="alert">History could not be loaded.</p> : <ol>{events?.map(event=><li><strong>{changed(event.before_details,event.after_details)}</strong><time>{new Date(event.created_at).toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'})} ET</time><small>{event.actor ? `Admin ${event.actor}`:'Customer submission'}</small></li>)}</ol>}<p class="admin-help">Showing the latest 100 changes.</p></section>
+<section class="packing-slip"><h2>Wolf House Farms · Packing slip</h2><p>{order.reference}</p><p>{order.customer.name}<br/>{order.customer.address}<br/>{order.customer.city}, {order.customer.state} {order.customer.zip}<br/>United States</p><ul>{order.items.map(item=><li>{item.quantity} × {item.name} · {item.pack}</li>)}</ul></section>
+<script>import '../../../scripts/admin';</script>
+</AdminLayout>

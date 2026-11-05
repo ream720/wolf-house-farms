@@ -1,0 +1,12 @@
+---
+import { policyUI } from '../data/policies';
+import { pathFor } from '../lib/routes';
+import type { Locale } from '../i18n/index';
+interface Props { locale: Locale; context: 'age' | 'checkout' }
+const { locale, context } = Astro.props;
+const p = policyUI[locale];
+---
+<label class="checkbox-label agreement-label">
+  <input type="checkbox" name="terms" required/>
+  <span>{context === 'age' ? p.ageAgreement : p.checkoutAgreement} <a href={pathFor(locale, 'terms')} target="_blank" rel="noopener">{p.terms}</a>, <a href={pathFor(locale, 'ordering')} target="_blank" rel="noopener">{p.ordering}</a> {p.and} <a href={pathFor(locale, 'privacy')} target="_blank" rel="noopener">{p.privacy}</a>.</span>
+</label>

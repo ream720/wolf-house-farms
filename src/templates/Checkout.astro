@@ -1,0 +1,31 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import { paymentMethods } from '../lib/orders';
+import Icon from '../components/Icon.astro';
+import Agreement from '../components/Agreement.astro';
+interface Props { locale: Locale; confirmation?: boolean }
+const { locale, confirmation = false } = Astro.props; const t = ui(locale);
+const states = [['AL','Alabama'],['AK','Alaska'],['AZ','Arizona'],['AR','Arkansas'],['CA','California'],['CO','Colorado'],['CT','Connecticut'],['DE','Delaware'],['DC','District of Columbia'],['FL','Florida'],['GA','Georgia'],['HI','Hawaii'],['ID','Idaho'],['IL','Illinois'],['IN','Indiana'],['IA','Iowa'],['KS','Kansas'],['KY','Kentucky'],['LA','Louisiana'],['ME','Maine'],['MD','Maryland'],['MA','Massachusetts'],['MI','Michigan'],['MN','Minnesota'],['MS','Mississippi'],['MO','Missouri'],['MT','Montana'],['NE','Nebraska'],['NV','Nevada'],['NH','New Hampshire'],['NJ','New Jersey'],['NM','New Mexico'],['NY','New York'],['NC','North Carolina'],['ND','North Dakota'],['OH','Ohio'],['OK','Oklahoma'],['OR','Oregon'],['PA','Pennsylvania'],['RI','Rhode Island'],['SC','South Carolina'],['SD','South Dakota'],['TN','Tennessee'],['TX','Texas'],['UT','Utah'],['VT','Vermont'],['VA','Virginia'],['WA','Washington'],['WV','West Virginia'],['WI','Wisconsin'],['WY','Wyoming']];
+---
+<section class:list={['page-intro wrap', { 'checkout-intro': !confirmation }]}>
+  {confirmation ? <><p class="eyebrow">{t.confirmationLabel}</p><h1>{t.confirmationTitle}</h1><p class="page-lead">{t.confirmationBody}</p></> : <><h1 class="sr-only">{t.cart}</h1><p class="page-lead">{t.checkoutIntro}</p></>}
+</section>
+<section class="wrap section-bottom" data-checkout data-confirmation={confirmation ? 'true' : 'false'}>
+  <noscript><p>{locale === 'en' ? 'Enable JavaScript to submit your reservation.' : 'Activa JavaScript para enviar tu reserva.'}</p></noscript>
+  <div class="empty-state" data-empty hidden><Icon name="bag" size={40}/><h2>{confirmation ? t.noConfirmation : t.cartEmpty}</h2><p>{t.cartEmptyBody}</p><a class="button" href={pathFor(locale,'genetics')}>{t.explore}<Icon/></a></div>
+  <div class="checkout-grid" data-checkout-content hidden><div>
+    {confirmation ? <div class="confirmation-details"><span class="eyebrow">{t.reference}</span><h2 data-reference></h2><p class="payment-status">{t.paymentStatus}</p><p data-confirmation-payment></p><h3>{t.nextSteps}</h3><p>{t.nextStepsBody}</p><p class="confirmation-note">{t.noEmail}</p><div class="confirmation-actions"><button class="button" data-print>{t.print}</button><button class="text-link" data-browse-more>{t.browseMore}<Icon/></button></div></div> : <form data-order-form novalidate>
+      <h2>{t.details}</h2><div class="form-grid">
+        <label class="full-field">{t.name}<input name="name" required autocomplete="name" maxlength="120"/></label>
+        <label class="full-field">{t.email}<input type="email" name="email" required autocomplete="email" maxlength="254"/></label>
+        <label class="full-field">{t.address}<input name="address" required autocomplete="street-address" maxlength="160"/></label>
+        <label>{t.city}<input name="city" required autocomplete="address-level2" maxlength="100"/></label>
+        <label>{t.state}<select name="state" required autocomplete="address-level1"><option value="">—</option>{states.map(([code,name]) => <option value={code}>{name}</option>)}</select></label>
+        <label>{t.zip}<input name="zip" required inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}(-[0-9]{4})?" maxlength="10"/></label><label>{t.country}<input value={t.usa} readonly/></label>
+      </div>
+      <fieldset class="payment-fields"><legend>{t.paymentDetails}</legend><p class="payment-help">{t.paymentIntro}</p><label>{t.paymentMethod}<select name="paymentMethod" required><option value="">{t.choosePayment}</option>{Object.entries(paymentMethods).map(([value,label])=><option value={value}>{label}</option>)}</select></label><label><span data-payment-account-label>{t.paymentAccount}</span><input name="paymentAccount" required maxlength="254" autocomplete="off" aria-describedby="payment-account-help"/></label><p class="payment-help" id="payment-account-help" data-payment-help>{t.paymentAccountHelp}</p></fieldset>
+      <Agreement locale={locale} context="checkout"/><p class="payment-help">{t.noEmail}</p><p role="alert" class="form-error" data-form-error hidden></p><button class="button" type="submit">{t.submitConfirmation}<Icon/></button><a class="policy-link" href={pathFor(locale,'ordering')}>{t.ordering}</a>
+    </form>}
+  </div><aside class="order-summary"><h2>{t.items}</h2><div data-cart-items></div><dl class="totals"><div><dt>{t.subtotal}</dt><dd data-subtotal></dd></div><div><dt>{t.shipping}</dt><dd data-shipping></dd></div><div class="grand-total"><dt>{t.total}</dt><dd data-total></dd></div></dl><p class="eyebrow">{t.currency}</p></aside></div>
+</section>

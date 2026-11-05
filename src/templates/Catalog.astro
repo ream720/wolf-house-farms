@@ -1,0 +1,15 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { strains, catalogLines } from '../data/catalog';
+import StrainCard from '../components/StrainCard.astro';
+interface Props { locale: Locale } const { locale } = Astro.props; const t = ui(locale);
+---
+<section class="page-intro wrap"><p class="eyebrow">{t.catalogEyebrow}</p><h1>{t.catalogTitle}</h1><p class="page-lead">{t.catalogIntro}</p></section>
+<section class="wrap catalog-section section-bottom" data-catalog>
+  <h2 class="sr-only">{t.genetics}</h2>
+  <p class="catalog-note">{t.catalogGuidance}</p>
+  <form class="catalog-filters catalog-search-collection" role="search"><label class="search-field">{t.search}<input type="search" name="q" placeholder={t.searchPlaceholder}/></label><label>{t.collection}<select name="collection"><option value="">{t.allCollections}</option>{catalogLines.map(line => <option value={line.id}>{t[line.label]}</option>)}</select></label><button class="text-link clear-filter" type="reset">{t.clearFilters}</button></form>
+  <p class="result-count" aria-live="polite"><span data-result-count>{strains.length}</span> <span data-result-label>{t.records}</span></p>
+  <div class="strain-grid compact-catalog">{strains.map(strain => <StrainCard strain={strain} locale={locale}/>)}</div>
+  <div class="empty-state" data-no-results hidden><h2>{t.noResults}</h2><button class="button button-outline" data-reset-filters>{t.clearFilters}</button></div>
+</section>

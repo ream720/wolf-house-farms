@@ -1,0 +1,74 @@
+---
+import '@fontsource/cormorant-garamond/400.css';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/500-italic.css';
+import '@fontsource/dm-sans/400.css';
+import '@fontsource/dm-sans/500.css';
+import '@fontsource/dm-sans/600.css';
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import AgeGate from '../components/AgeGate.astro';
+import { ui, type Locale } from '../i18n/index';
+import { pathFor, type Page } from '../lib/routes';
+import { SHOW_PROJECTS } from '../data/catalog';
+import { policyPages, policyUI } from '../data/policies';
+interface Props { locale: Locale; page: Page; slug?: string; title: string; description?: string; }
+const { locale, page, slug = '', title, description } = Astro.props;
+const t = ui(locale);
+const nav = SHOW_PROJECTS ? ['genetics', 'work', 'story'] as const : ['genetics', 'story'] as const;
+const current = page === 'strain' ? 'genetics' : page === 'project' ? 'work' : page;
+const isPolicyPage = policyPages.some(item => item === page);
+const p = policyUI[locale];
+---
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>{title === 'Wolf House Farms' ? title : `${title} — Wolf House Farms`}</title>
+    <meta name="description" content={description || t.heroIntro}/>
+    <meta name="robots" content="noindex, nofollow"/>
+    <meta name="theme-color" content="#121214"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="alternate" hreflang="en" href={pathFor('en', page, slug)}/>
+    <link rel="alternate" hreflang="es" href={pathFor('es', page, slug)}/>
+  </head>
+  <body data-locale={locale} class:list={{ 'age-locked': !isPolicyPage }}>
+    {!isPolicyPage && <AgeGate locale={locale} page={page} slug={slug}/>}
+    <div data-site-content inert={!isPolicyPage}>
+    <a class="skip-link" href="#main">{t.skip}</a>
+    <header class="site-header wrap">
+      <a class="wordmark" href={pathFor(locale,'home')} aria-label="Wolf House Farms">
+        <img class="wordmark-mascots" src="/images/wolf-xolo.webp" alt="" width="90" height="60"/><span>WOLF HOUSE<small>FARMS</small></span>
+      </a>
+      <nav class="desktop-nav" aria-label={locale === 'en' ? 'Main navigation' : 'Navegación principal'}>
+        {nav.map(item => <a href={pathFor(locale, item)} aria-current={current === item ? 'page' : undefined}>{t[item]}</a>)}
+      </nav>
+      <div class="header-tools">
+        <div class="language-switch" aria-label={t.language}>
+          <a lang="en" href={pathFor('en', page, slug)} aria-current={locale === 'en' ? 'true' : undefined} data-language="en">EN</a><span>/</span><a lang="es" href={pathFor('es', page, slug)} aria-current={locale === 'es' ? 'true' : undefined} data-language="es">ES</a>
+        </div>
+        <a class="cart-link" href={pathFor(locale,'checkout')} aria-label={t.cart}><Icon name="bag" size={20}/><span data-cart-count hidden>0</span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav">{t.menu}<span class="menu-lines" aria-hidden="true"></span></button>
+      </div>
+    </header>
+    <nav class="mobile-nav" id="mobile-nav" hidden aria-label={locale === 'en' ? 'Mobile navigation' : 'Navegación móvil'}>
+      {nav.map(item => <a href={pathFor(locale,item)} aria-current={current === item ? 'page' : undefined}>{t[item]}<Icon/></a>)}
+      <a href={pathFor(locale,'contact')}>{t.contact}<Icon/></a>
+    </nav>
+    <main id="main"><slot/></main>
+    <footer class="site-footer">
+      <div class="wrap footer-top">
+        <div><a class="wordmark footer-wordmark" href={pathFor(locale,'home')}><img class="wordmark-mascots" src="/images/wolf-xolo.webp" alt="" width="90" height="60"/><span>WOLF HOUSE<small>FARMS</small></span></a><p class="footer-tagline">{t.footerTagline}</p></div>
+        <div class="footer-links"><span class="eyebrow">{t.footerNote}</span><div>{nav.map(item => <a href={pathFor(locale,item)}>{t[item]}</a>)}<a href={pathFor(locale,'contact')}>{t.contact}</a></div></div>
+        <div class="footer-location"><Icon name="sun" size={46}/><p>{t.location}</p></div>
+      </div>
+      <div class="wrap footer-disclaimer"><p>{p.souvenir}</p></div>
+      <div class="wrap footer-bottom"><span>© {new Date().getFullYear()} Wolf House Farms</span><div>{policyPages.map(item => <a href={pathFor(locale, item)}>{p[item]}</a>)}</div></div>
+    </footer>
+    </div>
+    <div class="toast" role="status" aria-live="polite" hidden></div>
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>

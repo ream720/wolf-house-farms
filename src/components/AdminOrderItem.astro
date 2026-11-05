@@ -1,0 +1,12 @@
+---
+import { money } from '../i18n/index';
+interface Props { item: {id:string; name:string; pack:string; quantity:number; unitCents:number}; max:number; locked?:boolean }
+const {item,max,locked=false} = Astro.props;
+---
+<div class="admin-item" data-order-line>
+  <span>{item.name}<small>{item.pack} · {money(item.unitCents,'en')} / pack</small></span>
+  <div class="admin-item-controls">
+    <input type="number" data-order-item={item.id} data-price={item.unitCents} value={item.quantity} min="1" max={max} step="1" required readonly={locked} aria-label={`Quantity: ${item.name}`}/>
+    {!locked && <button type="button" class="text-link" data-remove-order-item aria-label={`Remove ${item.name}`}>Remove</button>}
+  </div>
+</div>

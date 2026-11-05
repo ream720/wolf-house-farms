@@ -1,0 +1,18 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import { strains, catalogLines, getCatalogLine } from '../data/catalog';
+import StrainCard from '../components/StrainCard.astro';
+import Icon from '../components/Icon.astro';
+interface Props { locale: Locale } const { locale } = Astro.props; const t = ui(locale);
+---
+<section class="catalog-hero wrap">
+  <div><p class="eyebrow">{t.catalogEyebrow}</p><h1>{t.heroTitle}</h1><p class="page-lead">{t.heroIntro}</p><div class="hero-actions"><a class="button" href="#selections">{t.explore}<Icon/></a></div></div>
+  <figure class="companion-art"><img src="/images/wolf-xolo.webp" alt={t.mascotAlt} width="1536" height="1024" fetchpriority="high"/></figure>
+</section>
+<section class="wrap selections-section section-bottom" id="selections">
+  <div class="section-heading"><h2 class="eyebrow catalog-section-label">{t.genetics}</h2><a class="text-link" href={pathFor(locale,'genetics')}>{t.search}<Icon/></a></div>
+  <p class="catalog-note">{t.catalogGuidance}</p>
+  {catalogLines.map(line => { const members = strains.filter(s => getCatalogLine(s).id === line.id); return <div class="selection-group" data-collection={line.id}><h3 class="collection-heading"><span class="collection-dot" aria-hidden="true"></span>{t[line.label]}<small>{String(members.length).padStart(2,'0')}</small></h3><div class="strain-grid compact-catalog">{members.map(strain => <StrainCard strain={strain} locale={locale}/>)}</div></div>; })}
+</section>
+<section class="wrap roots-strip"><div><p class="eyebrow">{t.storyEyebrow}</p><h2>{t.storyHeading}</h2></div><div><p>{t.storyBody}</p><a class="text-link" href={pathFor(locale,'story')}>{t.meet}<Icon/></a></div></section>

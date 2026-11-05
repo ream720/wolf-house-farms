@@ -1,0 +1,8 @@
+---
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import Icon from '../components/Icon.astro';
+import { contactEmail,instagramHandle,instagramUrl } from '../data/contact';
+interface Props { locale: Locale; kind: 'contact' | 'privacy' | 'ordering' } const { locale, kind } = Astro.props; const t = ui(locale);
+---
+<section class="page-intro wrap info-page"><p class="eyebrow">{kind === 'contact' ? t.contactEyebrow : t[kind]}</p><h1>{kind === 'contact' ? t.contactTitle : kind === 'privacy' ? t.privacyTitle : t.orderingTitle}</h1><p class="page-lead">{kind === 'contact' ? t.contactBody : kind === 'privacy' ? t.privacyBody : t.orderingBody}</p>{kind === 'contact' && <div class="contact-links"><p><span class="eyebrow">{t.email}</span><a class="text-link" href={`mailto:${contactEmail}`}>{contactEmail}<Icon/></a></p><p><span class="eyebrow">Instagram</span><a class="text-link" href={instagramUrl} target="_blank" rel="noopener noreferrer">{instagramHandle}<Icon/></a></p></div>}<a class="button button-outline" href={pathFor(locale,'genetics')}>{t.explore}<Icon/></a></section>

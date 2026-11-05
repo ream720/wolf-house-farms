@@ -1,0 +1,32 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../../lib/server/backend';
+import { paymentMethods, paymentStatuses, fulfillmentStatuses, OrderError, type Order } from '../../../lib/orders';
+import { money } from '../../../i18n/index';
+export const prerender = false;
+let db;
+try { ({db} = await requireAdmin(Astro)); }
+catch(error) { if (error instanceof OrderError && error.status === 403) { Astro.response.status=403; } else return Astro.redirect('/admin/login/',302); }
+const q = (Astro.url.searchParams.get('q') || '').trim().slice(0,100);
+const payment = Astro.url.searchParams.get('payment') || '';
+const fulfillment = Astro.url.searchParams.get('fulfillment') || '';
+const page = Math.min(10000,Math.max(1,Number.parseInt(Astro.url.searchParams.get('page') || '1') || 1));
+let orders: Order[] = []; let count = 0; let error = db ? '' : 'This account does not have WHF admin access.';
+if (db) {
+  let query = db.from('whf_orders').select('id,reference,created_at,customer,payment,total,payment_status,fulfillment_status',{count:'exact'}).order('created_at',{ascending:false}).order('id',{ascending:false}).range((page-1)*25,page*25-1);
+  if (paymentStatuses.includes(payment as never)) query = query.eq('payment_status',payment);
+  if (fulfillmentStatuses.includes(fulfillment as never)) query = query.eq('fulfillment_status',fulfillment);
+  if (q) { const safe = q.replace(/[^\p{L}\p{N}@ ._-]/gu,'').replaceAll('_','\\_'); query = query.or(`reference.ilike.%${safe}%,customer->>name.ilike.%${safe}%,customer->>email.ilike.%${safe}%`); }
+  const result = await query;
+  if (result.error) error = 'Orders could not be loaded. Please try refreshing.';
+  else { orders = (result.data || []) as unknown as Order[]; count = result.count || 0; }
+}
+const pageLink = (n:number) => { const params = new URLSearchParams(Astro.url.searchParams); params.set('page',String(n)); return `?${params}`; };
+const label = (s:string) => s.replaceAll('_',' ');
+---
+<AdminLayout title="Orders" signedIn={!!db}>
+<div class="admin-page-heading"><div><p class="eyebrow">WHF / Fulfillment</p><h1>Orders</h1><p>Review each reservation, request payment, and keep deliveries moving.</p></div><span class="admin-count">{count} matching {count === 1 ? 'order':'orders'}</span></div>
+<form class="admin-filters" method="get"><label>Search orders<input type="search" name="q" value={q} maxlength="100" placeholder="Reference, name, or email"/></label><label>Payment<select name="payment"><option value="">All payment statuses</option>{paymentStatuses.map(s=><option value={s} selected={s===payment}>{label(s)}</option>)}</select></label><label>Fulfillment<select name="fulfillment"><option value="">All fulfillment statuses</option>{fulfillmentStatuses.map(s=><option value={s} selected={s===fulfillment}>{label(s)}</option>)}</select></label><button class="button" type="submit">Filter</button><a class="text-link" href="/admin/orders/">Clear</a></form>
+{error ? <p role="alert" class="admin-notice">{error}</p> : orders.length ? <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>Order / placed</th><th>Customer</th><th>Invoice contact</th><th>Total</th><th>Payment</th><th>Fulfillment</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody>{orders.map(order=><tr><td><a class="order-reference" href={`/admin/orders/${order.id}/`}>{order.reference}</a><small>{new Date(order.created_at).toLocaleString('en-US',{timeZone:'America/New_York',dateStyle:'medium',timeStyle:'short'})} ET</small></td><td>{order.customer.name}<small>{order.customer.email}</small></td><td>{paymentMethods[order.payment.method]}<small>{order.payment.account}</small></td><td>{money(order.total,'en')}</td><td><span class="admin-badge" data-status={order.payment_status}>{label(order.payment_status)}</span></td><td><span class="admin-badge" data-status={order.fulfillment_status}>{label(order.fulfillment_status)}</span></td><td><a class="text-link" href={`/admin/orders/${order.id}/`}>Manage →</a></td></tr>)}</tbody></table></div> : <div class="admin-panel admin-empty"><h2>{q || payment || fulfillment ? 'No matching orders.' : 'Ready for the first order.'}</h2><p>{q || payment || fulfillment ? 'Try another search or clear the filters.' : 'Submitted reservations will appear here with their payment contact and delivery details.'}</p></div>}
+<nav class="admin-pagination" aria-label="Order pages">{page > 1 && <a class="text-link" href={pageLink(page-1)}>← Previous</a>}<span>Page {page} · Up to 25 orders per page</span>{(page * 25 < count) && <a class="text-link" href={pageLink(page+1)}>Next →</a>}</nav>
+</AdminLayout>
