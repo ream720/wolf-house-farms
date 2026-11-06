@@ -8,7 +8,8 @@ import {
   type CartItem,
 } from "../lib/reservation";
 import { pathFor } from "../lib/routes";
-import { paymentMethods, parsePayment, type OrderItem, type OrderDetails } from '../lib/orders';
+import { paymentMethodLabel, parsePayment, type OrderItem, type OrderDetails } from '../lib/orders';
+import { isCashByMailReady } from '../data/payments';
 import { POLICY_VERSION } from '../data/policies';
 
 const locale: Locale = document.body.dataset.locale === "es" ? "es" : "en";
@@ -285,7 +286,7 @@ function renderSummary() {
     $("[data-reference]")!.textContent = confirmation.reference;
   if (isConfirmation && confirmation?.payment) {
     const payment = confirmation.payment;
-    $('[data-confirmation-payment]')!.textContent = `${t.paymentMethod}: ${paymentMethods[payment.method]} · ${payment.account}`;
+    $('[data-confirmation-payment]')!.textContent = `${t.paymentMethod}: ${paymentMethodLabel(payment.method,locale)}${payment.account ? ` · ${payment.account}` : ''}`;
   }
 }
 
@@ -316,14 +317,21 @@ if (form) {
   function updatePaymentHelp() {
     const hints = {
       cashapp: [t.cashappAccount, t.cashappHelp, '$yourcashtag'],
-      paypal: [t.paypalAccount, t.paypalHelp, 'you@example.com'],
-      zelle: [t.contactAccount, t.zelleHelp, 'you@example.com / +1…'],
       apple_pay: [t.contactAccount, t.applePayHelp, 'you@example.com / +1…'],
+      cash: ['',t.cashMailHelp,''],
     };
     const hint = hints[method.value as keyof typeof hints] || [t.paymentAccount,t.paymentAccountHelp,''];
     $('[data-payment-account-label]')!.textContent=hint[0];
     $('[data-payment-help]')!.textContent=hint[1];
     account.placeholder=hint[2]; account.setCustomValidity('');
+    const cash = method.value === 'cash';
+    account.required = !cash; account.disabled = cash;
+    $('[data-payment-account-field]')!.hidden = cash;
+    $('[data-payment-help]')!.hidden = cash;
+    for (const panel of document.querySelectorAll<HTMLElement>('[data-payment-destination]')) panel.hidden = panel.dataset.paymentDestination !== method.value;
+    const submit = form!.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    submit.disabled = cash && !isCashByMailReady();
+    submit.textContent = submit.disabled ? t.cashMailPreviewButton : t.submitConfirmation;
   }
   try {
     const draft = read(sessionStorage, DRAFT_KEY) as Record<
@@ -352,6 +360,9 @@ if (form) {
       data[key] = (form.elements.namedItem(key) as HTMLInputElement).value;
     data.terms = (form.elements.namedItem("terms") as HTMLInputElement).checked;
     const error = $("[data-form-error]")!;
+    if (method.value === 'cash' && !isCashByMailReady()) {
+      error.textContent = t.cashMailPending; error.hidden = false; method.focus(); return;
+    }
     try { parsePayment({method:data.paymentMethod,account:data.paymentAccount}); }
     catch { account.setCustomValidity(t.paymentError); }
     if (!validCheckoutForm(data) || !form.checkValidity()) {
@@ -367,7 +378,6 @@ if (form) {
       return;
     }
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-    const originalLabel = button.textContent;
     submitting = true; button.disabled = true; button.textContent = t.submitting;
     error.hidden = true;
     try {
@@ -392,7 +402,7 @@ if (form) {
     } catch (failure) {
       error.textContent=failure instanceof Error && [t.storageError,t.orderUnavailable,t.orderRateLimit,t.orderError].includes(failure.message) ? failure.message : t.orderError;
       error.hidden=false;
-    } finally {submitting=false;button.disabled=false;button.textContent=originalLabel;}
+    } finally {submitting=false;updatePaymentHelp();}
   });
 }
 $("[data-print]")?.addEventListener("click", () => window.print());

@@ -17,6 +17,9 @@ try {
   assert.equal((await send('/api/admin/orders/00000000-0000-4000-8000-000000000000/',{},'','PATCH')).status,401);
   assert.equal((await fetch(`${origin}/api/orders/`,{method:'POST',headers:{Origin:'https://other.example','Content-Type':'application/json'},body:'{}'})).status,403);
   const invalid=await send('/api/orders/',{...payload,payment:{method:'cashapp',account:''}}); assert.equal(invalid.status,400);
+  for (const payment of [{method:'paypal',account:email},{method:'zelle',account:email},{method:'cash',account:''}]) {
+    assert.equal((await send('/api/orders/',{...payload,payment})).status,400);
+  }
   const submissions=await Promise.all([send('/api/orders/',payload),send('/api/orders/',payload)]);
   const receipts=await Promise.all(submissions.map(async r=>{const body=await r.json();assert.equal(r.status,201,JSON.stringify(body));return body.confirmation;}));
   assert.deepEqual(receipts[0],receipts[1]); assert.equal(receipts[0].total,7000);
@@ -36,11 +39,20 @@ try {
   assert.equal((await send(`/api/admin/orders/${orderId}/`,{...edit,version:2,fulfillment_status:'shipped',tracking:'TEST123'},cookie,'PATCH')).status,200);
   assert.equal((await send(`/api/admin/orders/${orderId}/`,{...edit,version:3,fulfillment_status:'shipped',tracking:'TEST123',notes:'Updated after shipping'},cookie,'PATCH')).status,200);
   assert.equal((await send(`/api/admin/orders/${orderId}/`,{...edit,version:4,fulfillment_status:'shipped',tracking:'TEST123',customer:{...customer,address:'456 Changed Street'}},cookie,'PATCH')).status,400);
+  let version=4;
+  for(const method of ['paypal','zelle']) {
+    const legacyPayment={method,account:email};
+    assert.ifError((await db.from('whf_orders').update({payment:legacyPayment}).eq('id',orderId)).error);
+    const legacyDetail=await fetch(`${origin}/admin/orders/${orderId}/`,{headers:{Cookie:cookie}});
+    assert.equal(legacyDetail.status,200);assert.match(await legacyDetail.text(),/retains its original payment method/);
+    const retained=await send(`/api/admin/orders/${orderId}/`,{...edit,version,payment:legacyPayment,fulfillment_status:'shipped',tracking:'TEST123'},cookie,'PATCH');
+    assert.equal(retained.status,200);version++;
+  }
   const publicClient=createClient(process.env.SUPABASE_URL,process.env.SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false}});
   assert.ok((await publicClient.from('whf_orders').select('*')).error);
   assert.ifError((await db.from('whf_admins').delete().eq('user_id',userId)).error);
   assert.equal((await fetch(`${origin}/admin/orders/`,{headers:{Cookie:cookie}})).status,403);
-  console.log('Live checks passed: checkout, concurrent retry, validation, admin login, authorization, edits, conflicts, history, and public data isolation.');
+  console.log('Live checks passed: checkout, payment restrictions, retained legacy payments, concurrent retry, admin login, authorization, edits, conflicts, history, and public data isolation.');
 } finally {
   if (!orderId) { const lookup=await db.from('whf_orders').select('id').eq('request_id',requestId).maybeSingle();orderId=lookup.data?.id; }
   if(orderId){assert.ifError((await db.from('whf_order_events').delete().eq('order_id',orderId)).error);assert.ifError((await db.from('whf_orders').delete().eq('id',orderId)).error);}

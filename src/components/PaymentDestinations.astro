@@ -1,0 +1,22 @@
+---
+import { paymentDestinations, isCashByMailReady } from '../data/payments';
+import { ui, type Locale } from '../i18n';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = ui(locale);
+const address = paymentDestinations.cashMailAddress;
+---
+<div aria-live="polite">
+  <section class="payment-destination" data-payment-destination="cashapp" hidden>
+    <h3>{t.paymentDestination}</h3><p class="payment-destination-value">Cash App · {paymentDestinations.cashAppCashtag}</p><p class="payment-help">{t.paymentWait}</p>
+  </section>
+  <section class="payment-destination" data-payment-destination="apple_pay" hidden>
+    <h3>{t.paymentDestination}</h3><p class="payment-destination-value">Apple Pay · {paymentDestinations.applePayPhone || t.applePayPending}</p><p class="payment-help">{t.paymentWait}</p>
+  </section>
+  <section class="payment-destination" data-payment-destination="cash" hidden>
+    <h3>{t.paymentDestination}</h3>
+    {isCashByMailReady(address) && address ? <address class="payment-destination-value">{address.recipient}<br/>{address.poBox}<br/>{address.city}, {address.state} {address.zip}</address> : <p class="payment-destination-value">{t.cashMailPendingAddress}</p>}
+    <p class="payment-help">{t.cashMailHelp}</p>
+    {!isCashByMailReady(address) && <p class="payment-preview-notice">{t.cashMailPending}</p>}
+  </section>
+</div>

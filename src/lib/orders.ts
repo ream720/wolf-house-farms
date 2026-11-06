@@ -1,9 +1,15 @@
 import { offers, getStrain, isOfferAvailable, SHIPPING_CENTS } from '../data/catalog.ts';
 import { validCheckoutForm, type CartItem } from './reservation.ts';
 import { POLICY_VERSION, policyUI } from '../data/policies.ts';
+import { isCashByMailReady } from '../data/payments.ts';
 
-export const paymentMethods = { cashapp: 'Cash App', paypal: 'PayPal', zelle: 'Zelle', apple_pay: 'Apple Pay' } as const;
-export type PaymentMethod = keyof typeof paymentMethods;
+export const paymentMethods = { cashapp: 'Cash App', apple_pay: 'Apple Pay', cash: 'Cash by mail' } as const;
+const legacyPaymentMethods = { paypal: 'PayPal', zelle: 'Zelle' } as const;
+export type PaymentMethod = keyof typeof paymentMethods | keyof typeof legacyPaymentMethods;
+export function paymentMethodLabel(method: PaymentMethod, locale: 'en' | 'es' = 'en') {
+  if (method === 'cash' && locale === 'es') return 'Efectivo por correo';
+  return ({...paymentMethods,...legacyPaymentMethods})[method];
+}
 export const paymentStatuses = ['pending', 'requested', 'paid', 'refunded'] as const;
 export const fulfillmentStatuses = ['unfulfilled', 'packing', 'shipped', 'delivered', 'cancelled'] as const;
 export interface Customer { name: string; email: string; address: string; city: string; state: string; zip: string }
@@ -38,10 +44,13 @@ export function parseCustomer(raw: unknown): Customer {
   return customer;
 }
 const US_STATES = new Set('AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY'.split(' '));
-export function parsePayment(raw: unknown): OrderDetails['payment'] {
+export function parsePayment(raw: unknown, previousMethod?: PaymentMethod): OrderDetails['payment'] {
   if (!raw || typeof raw !== 'object') throw new OrderError('Choose a payment method and enter your account.');
   const { method, account } = raw as Record<string, unknown>;
-  if (typeof method !== 'string' || !Object.hasOwn(paymentMethods, method)) throw new OrderError('Choose a supported payment method.');
+  const retainedLegacy = typeof method === 'string' && Object.hasOwn(legacyPaymentMethods, method) && method === previousMethod;
+  if (typeof method !== 'string' || (!Object.hasOwn(paymentMethods, method) && !retainedLegacy)) throw new OrderError('Choose a supported payment method.');
+  // Cash has no payment-app account. Ignore stale values from a previous choice.
+  if (method === 'cash') return {method, account:''};
   const value = cleanText(account, 254, 2);
   if (method === 'cashapp' && !/^\$?[a-zA-Z0-9_]{1,20}$/.test(value)) throw new OrderError('Enter your Cash App $Cashtag.');
   if (['zelle','apple_pay'].includes(method) && !(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) || /^\+?[\d ().-]{7,25}$/.test(value) && value.replace(/\D/g, '').length >= 10)) throw new OrderError('Enter the email address or phone number registered to this payment method.');
@@ -49,7 +58,10 @@ export function parsePayment(raw: unknown): OrderDetails['payment'] {
 }
 export function buildOrderDetails(raw: Record<string, unknown>, previous?: Order): OrderDetails {
   const customer = parseCustomer(raw.customer);
-  const payment = parsePayment(raw.payment);
+  const payment = parsePayment(raw.payment, previous?.payment.method);
+  if (payment.method === 'cash' && previous?.payment.method !== 'cash' && !isCashByMailReady()) {
+    throw new OrderError('Cash by mail is a preview until WHF confirms its P.O. Box address. Choose Cash App or Apple Pay.');
+  }
   if (!Array.isArray(raw.cart) || !raw.cart.length || raw.cart.length > 30) throw new OrderError('Your bag is empty or invalid.');
   // Preserve the agreed price/pack for existing lines during admin edits, even if an offer is retired.
   const seen = new Set<string>();

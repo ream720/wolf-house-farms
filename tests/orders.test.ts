@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildOrderDetails, buildPublicOrderDetails, parsePayment, parseCustomer, validateWorkflow, type Order } from '../src/lib/orders.ts';
+import { buildOrderDetails, buildPublicOrderDetails, parsePayment, parseCustomer, paymentMethods, paymentMethodLabel, validateWorkflow, type Order } from '../src/lib/orders.ts';
+import { isCashByMailReady, paymentDestinations } from '../src/data/payments.ts';
 import { POLICY_VERSION } from '../src/data/policies.ts';
 import { strains,offers } from '../src/data/catalog.ts';
 const customer = {name:'Test Customer',email:'test@example.com',address:'123 Test Street',city:'Fresno',state:'CA',zip:'93701'};
@@ -21,9 +22,40 @@ test('public orders reject missing, false, forged or stale consent and retain th
     assert.deepEqual(buildPublicOrderDetails({...raw,locale:locale === 'en' ? 'es':'en'}),details);
   }
 });
-test('all four payment choices require the appropriate account contact',()=>{
-  for(const [method,account] of [['cashapp','$TestCustomer'],['paypal','test@example.com'],['paypal','TestCustomer'],['zelle','test@example.com'],['apple_pay','+1 (555) 555-0100']]) assert.deepEqual(parsePayment({method,account}),{method,account});
-  for(const value of [null,{}, {method:'card',account:'test'}, {method:'cashapp',account:'a b'}, {method:'paypal',account:' '}, {method:'zelle',account:'username'}, {method:'apple_pay',account:'1234567'}, {method:'__proto__',account:'test'}]) assert.throws(()=>parsePayment(value));
+test('new payment choices are Cash App, Apple Pay and cash without a payment-app account',()=>{
+  assert.deepEqual(Object.keys(paymentMethods),['cashapp','apple_pay','cash']);
+  for(const [method,account] of [['cashapp','$TestCustomer'],['apple_pay','test@example.com'],['apple_pay','+1 (555) 555-0100']]) assert.deepEqual(parsePayment({method,account}),{method,account});
+  assert.deepEqual(parsePayment({method:'cash',account:''}),{method:'cash',account:''});
+  assert.deepEqual(parsePayment({method:'cash',account:'stale-account'}),{method:'cash',account:''});
+  for(const value of [null,{}, {method:'card',account:'test'}, {method:'cashapp',account:'a b'}, {method:'paypal',account:'test@example.com'}, {method:'zelle',account:'test@example.com'}, {method:'apple_pay',account:'1234567'}, {method:'__proto__',account:'test'}]) assert.throws(()=>parsePayment(value));
+});
+
+test('retired payment methods remain editable only on orders already using that method',()=>{
+  for(const method of ['paypal','zelle'] as const) {
+    const original=buildOrderDetails(input);
+    const previous={...original,payment:{method,account:'test@example.com'}} as Order;
+    const payload={...input,payment:previous.payment};
+    assert.equal(buildOrderDetails(payload,previous).payment.method,method);
+    assert.throws(()=>buildOrderDetails(payload),/supported payment/);
+    assert.throws(()=>buildOrderDetails(payload,{...previous,payment:original.payment}),/supported payment/);
+    assert.equal(buildOrderDetails(input,previous).payment.method,'cashapp');
+    assert.ok(paymentMethodLabel(method));
+  }
+});
+
+test('cash cannot be submitted until a complete mailing destination is configured',()=>{
+  assert.equal(isCashByMailReady(null),false);
+  const address={recipient:'WHF verification',poBox:'PO Box 123',city:'Fresno',state:'CA',zip:'93701'};
+  for(const field of Object.keys(address)) assert.equal(isCashByMailReady({...address,[field]:''}),false);
+  assert.equal(isCashByMailReady(address),true);
+  const saved=paymentDestinations.cashMailAddress;
+  try {
+    paymentDestinations.cashMailAddress=null;
+    const raw={...input,payment:{method:'cash',account:'stale-account'},terms:true,policyVersion:POLICY_VERSION};
+    assert.throws(()=>buildPublicOrderDetails(raw),/P.O. Box/);
+    paymentDestinations.cashMailAddress=address;
+    assert.deepEqual(buildPublicOrderDetails(raw).payment,{method:'cash',account:''});
+  } finally {paymentDestinations.cashMailAddress=saved;}
 });
 test('server validates bounded US contact details',()=>{
   assert.equal(parseCustomer({...customer,name:'  Test Customer '}).name,'Test Customer');

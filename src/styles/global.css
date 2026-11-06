@@ -2501,6 +2501,12 @@ select option { background: #1d1d22; }
 .payment-fields legend { font:500 30px var(--serif); padding-right:15px; }
 .payment-fields label { display:grid; gap:8px; font-size:12px; margin-top:20px; }
 .payment-help { font-size:12px; line-height:1.7; color:var(--muted); margin-top:12px; }
+.payment-fields [hidden] { display:none; }
+.payment-destination { margin-top:20px; padding:20px; border:1px solid var(--line); }
+.payment-destination h3 { font:500 23px var(--serif); }
+.payment-destination-value { margin-top:12px; font-size:15px; font-style:normal; overflow-wrap:anywhere; }
+.payment-preview-notice { margin-top:16px; color:var(--marigold); font-size:12px; line-height:1.7; }
+.payment-fields ~ button:disabled { cursor:not-allowed; }
 .confirmation-details [data-reference] { overflow-wrap:anywhere; font-size:clamp(24px,3vw,38px); }
 [data-confirmation-payment] { overflow-wrap:anywhere; margin-top:18px; font-size:13px; }
 button:disabled { opacity:.6; cursor:wait; }

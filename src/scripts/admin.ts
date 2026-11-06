@@ -1,6 +1,15 @@
 const form = document.querySelector<HTMLFormElement>('[data-admin-order]');
 const money = (n:number) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n/100);
 if (form) {
+  const paymentMethod = form.querySelector<HTMLSelectElement>('[data-admin-payment-method]')!;
+  const paymentAccount = form.querySelector<HTMLInputElement>('[data-admin-payment-account]')!;
+  function updatePaymentAccount() {
+    const cash = paymentMethod.value === 'cash';
+    paymentAccount.required = !cash; paymentAccount.disabled = cash;
+    form!.querySelector<HTMLElement>('[data-admin-payment-account-field]')!.hidden = cash;
+  }
+  updatePaymentAccount();
+  paymentMethod.addEventListener('change',updatePaymentAccount);
   const lines = form.querySelector<HTMLElement>('[data-order-lines]')!;
   const itemInputs = () => [...lines.querySelectorAll<HTMLInputElement>('[data-order-item]')];
   const addSelect = form.querySelector<HTMLSelectElement>('[data-add-item-select]');

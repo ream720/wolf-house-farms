@@ -52,6 +52,7 @@
 .admin-history li { border-left:2px solid var(--pink); padding-left:16px; }
 .admin-history time, .admin-history small { display:block; color:var(--muted); margin-top:5px; font-size:11px; }
 .packing-slip { display:none; }
+[data-admin-payment-account-field][hidden] { display:none; }
 @media(max-width:900px) { .admin-filters {grid-template-columns:1fr 1fr;} .admin-filters label:first-child {grid-column:1/-1;} .admin-order-grid {grid-template-columns:1fr;} .admin-page-heading {align-items:flex-start;flex-direction:column;} }
 @media(max-width:500px) { .admin-main {padding:24px 20px;} .admin-header {padding:16px 20px;} .admin-brand img {display:none;} .admin-header nav {gap:14px;} .admin-panel {padding:20px;} .admin-filters {grid-template-columns:1fr;} .admin-panel .form-grid {grid-template-columns:1fr;} .admin-login {margin:24px auto;} .admin-add-item {align-items:stretch;flex-direction:column;} .admin-item-controls {flex-direction:column;gap:8px;} }
 @media print { .admin-header,.admin-main > :not(.packing-slip) {display:none !important;} .packing-slip {display:block;color:#111;background:white;font-size:14px;} .admin-body {background:white;} .packing-slip h2 {font-size:26px;} .packing-slip p,.packing-slip ul {margin:24px 0;} }

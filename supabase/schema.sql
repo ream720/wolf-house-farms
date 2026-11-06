@@ -13,7 +13,14 @@ create table public.whf_orders (
   version integer not null default 1 check (version > 0),
   locale text not null check (locale in ('en','es')),
   customer jsonb not null,
-  payment jsonb not null check (payment->>'method' in ('cashapp','paypal','zelle','apple_pay') and length(payment->>'account') between 2 and 254),
+  -- Retired methods remain valid for historical orders. New choices are enforced
+  -- by the application; mailed cash deliberately has no payment-app account.
+  payment jsonb not null check (coalesce(
+    jsonb_typeof(payment) = 'object' and jsonb_typeof(payment->'method') = 'string'
+    and jsonb_typeof(payment->'account') = 'string' and (
+      (payment->>'method' = 'cash' and payment->>'account' = '') or
+      (payment->>'method' in ('cashapp','paypal','zelle','apple_pay') and length(trim(payment->>'account')) between 2 and 254)
+    ), false)),
   items jsonb not null check (jsonb_typeof(items) = 'array' and jsonb_array_length(items) > 0),
   subtotal integer not null check (subtotal >= 0),
   shipping integer not null check (shipping >= 0),

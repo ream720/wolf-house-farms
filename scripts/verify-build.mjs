@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
+import { POLICY_VERSION } from '../src/data/policies.ts';
 const root = path.resolve("dist/client");
 async function walk(dir) {
   const files = await readdir(dir, { withFileTypes: true });
@@ -33,7 +34,7 @@ for (const file of pages) {
   const isPolicy = /^(?:terms|privacy|ordering|faq|es\/(?:terminos|privacidad|pedidos|preguntas-frecuentes))\/index\.html$/.test(relative);
   if (isPolicy) {
     assert.doesNotMatch(html, /class="age-gate"|data-site-content inert/);
-    assert.match(html, /data-policy-version="2026-11-05"/);
+    assert.ok(html.includes(`data-policy-version="${POLICY_VERSION}"`));
   } else {
     assert.match(html, /class="age-gate"/);
     assert.match(html, /data-site-content inert/);
@@ -51,6 +52,14 @@ for (const file of pages) {
   if (/\/(?:genetics|genetica)\/[^/]+\/index\.html$/.test(`/${relative}`)) {
     assert.match(html,/data-add-offer=/,`${file}: variety cannot be ordered`);
     assert.match(html,/(?:\$|USD\s*)60\.00/,`${file}: pack must cost $60`);
+  }
+  if (['checkout/index.html','es/reserva/index.html'].includes(relative)) {
+    const methods = [...html.matchAll(/<option value="(cashapp|apple_pay|cash|paypal|zelle)"/g)].map(match=>match[1]);
+    assert.deepEqual(methods,['cashapp','apple_pay','cash']);
+    assert.ok(html.includes('$Wolfhousegenetics'));
+    assert.match(html,/data-payment-account-field/);
+    assert.match(html,/data-payment-destination="cash"/);
+    assert.doesNotMatch(copy,/PayPal|Zelle/);
   }
   for (const match of html.matchAll(
     /(?:href|src)="(\/[^"#?]*)(?:[?#][^"]*)?"/g,
