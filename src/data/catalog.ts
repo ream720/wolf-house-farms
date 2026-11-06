@@ -15,9 +15,10 @@ export interface Project {
 export const projects: Project[] = [];
 
 export const catalogLines = [
-  { id: "original", label: "originalSelections" },
-  { id: "cherry-booberries", label: "cherryBatch" },
-  { id: "plantz", label: "plantzLine" },
+  { id: "caviar", label: "winterLine", comingSoon: true },
+  { id: "original", label: "originalSelections", comingSoon: false },
+  { id: "cherry-booberries", label: "cherryBatch", comingSoon: false },
+  { id: "plantz", label: "plantzLine", comingSoon: false },
 ] as const;
 export type CatalogLineId = (typeof catalogLines)[number]["id"];
 
@@ -25,7 +26,7 @@ export interface Strain {
   id: string;
   name: string;
   project?: string;
-  status: "current" | "historical" | "retired";
+  status: "coming-soon" | "current" | "historical" | "retired";
   /** Whether this variety accepts reservations. Finite stock is managed by WHF. */
   available: boolean;
   number: string;
@@ -204,6 +205,31 @@ for (const [index, [id, mother, suppliedLineage, available]] of plantzCrosses.en
 export const getCatalogLine = (strain: Strain) =>
   catalogLines.find(line => line.id === (strain.collection ?? "original"))!;
 
+const caviarCrosses = [
+  ['gary-payton-zushi-caviar', 'Gary Payton x Zushi x Caviar'],
+  ['bakers-dozen-caviar', 'Bakers Dozen x Caviar'],
+  ['toronjaz-caviar', 'Toronjaz x Caviar'],
+  ['maple-nectar-caviar', 'Maple Nectar x Caviar'],
+  ['plantz-caviar', 'Plantz x Caviar'],
+] as const;
+for (const [index, [id, suppliedLineage]] of caviarCrosses.entries()) {
+  strains.push({
+    id, name: suppliedLineage, suppliedLineage,
+    number: String(index + 19).padStart(2,'0'), collection:'caviar',
+    available:false, status:'coming-soon', source:'breeder-message',
+    // The supplied list does not confirm parent sexes or seed type.
+    imageAlt:text('',''), artStory:text('',''),
+    description:text(
+      `${suppliedLineage} is part of Winter is coming, the upcoming Caviar line from Wolf House Farms.`,
+      `${suppliedLineage} forma parte de Winter is coming, la próxima línea Caviar de Wolf House Farms.`,
+    ),
+  });
+}
+
+// Public display order follows the collection order without changing stable
+// record numbers or established order SKUs.
+export const catalogStrains = catalogLines.flatMap(line => strains.filter(strain => getCatalogLine(strain).id === line.id));
+
 /** Female x male, grouping only a parent that is itself a cross. */
 export function formatLineage(strain: Pick<Strain, "mother" | "father" | "suppliedLineage">): string {
   if (!strain.mother || !strain.father) return strain.suppliedLineage;
@@ -229,7 +255,8 @@ export const offers = strains.map(strain => ({
 
 // No release schedule: reservation eligibility belongs to each variety.
 export function isOfferAvailable(offer: (typeof offers)[number]): boolean {
-  return strains.find(s => s.id === offer.strain)?.available === true;
+  const strain = strains.find(s => s.id === offer.strain);
+  return strain?.available === true && strain.status !== 'coming-soon';
 }
 export function getAvailableOffer(strainId: string) {
   return offers.find(o => o.strain === strainId && isOfferAvailable(o));

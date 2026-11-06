@@ -1,14 +1,16 @@
 ---
 import { formatLineage, getCatalogLine, type Strain } from '../data/catalog';
-import type { Locale } from '../i18n/index';
+import { ui, type Locale } from '../i18n/index';
 import { pathFor } from '../lib/routes';
 import Icon from './Icon.astro';
 interface Props { strain: Strain; locale: Locale }
 const { strain: s, locale } = Astro.props;
 const line = getCatalogLine(s);
 const lineage = formatLineage(s);
+const t = ui(locale);
 ---
-<a class="strain-card catalog-entry" href={pathFor(locale,'strain',s.id)} data-strain-card data-collection={line.id} data-search={`${s.name} ${lineage}`.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}>
+<a class="strain-card catalog-entry" href={pathFor(locale,'strain',s.id)} data-strain-card data-collection={line.id} data-search={`${s.name} ${lineage} ${t[line.label]}`.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}>
+  {s.status === 'coming-soon' && <span class="release-badge">{t.comingSoon}</span>}
   <div class="strain-title"><h3>{s.name}</h3><span class="entry-arrow" aria-hidden="true"><Icon/></span></div>
   {s.name !== lineage && <p class="strain-lineage">{lineage}</p>}
 </a>

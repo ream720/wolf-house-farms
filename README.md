@@ -26,7 +26,7 @@ npm run verify:build
 npm run audit:security
 ```
 
-Build verification checks 57 public HTML pages, local links and assets, and legacy redirects in the Vercel routing configuration. Live backend verification scripts are for isolated development environments only; they create temporary order and authentication fixtures.
+Build verification checks 67 public HTML pages, local links and assets, upcoming-variety restrictions, and legacy redirects in the Vercel routing configuration. Live backend verification scripts are for isolated development environments only; they create temporary order and authentication fixtures.
 
 The application uses Astro 7 and its Vercel adapter. Scoped dependency overrides keep the adapter's `glob` and `path-to-regexp` dependencies on patched releases until upstream updates those ranges. The security audit uses the official npm registry because some registry mirrors do not support the audit API. Commit `package-lock.json` with dependency changes and rerun these checks before deployment.
 
@@ -51,6 +51,7 @@ A new backend requires the schema and administrator membership to be configured 
 ## Current behavior
 
 - English and Spanish catalogs, variety pages, search and collection filters.
+- Winter is coming leads the catalog with five Caviar crosses marked Coming soon; the existing 18 varieties remain available.
 - Adult entry and policy acknowledgement, shared cart and server-validated checkout.
 - Durable order storage, retry protection and saved original order details.
 - Approved-user administration for order edits, fulfillment, tracking, packing slips and change history.

@@ -2318,6 +2318,12 @@ body::before { display: none; }
 .collection-dot { width: 7px; height: 7px; background: var(--olive); border-radius: 50%; }
 .selection-group[data-collection="cherry-booberries"] .collection-dot { background: var(--pink); }
 .selection-group[data-collection="plantz"] .collection-dot { background: var(--marigold); }
+.selection-group[data-collection="caviar"] .collection-dot { background:#bbd9e6; }
+.selection-group[data-collection="caviar"] .collection-heading { font:500 30px/1.3 var(--serif); letter-spacing:.02em; flex-wrap:wrap; }
+.release-badge { display:inline-flex; align-self:flex-start; width:max-content; max-width:100%; padding:4px 8px; border:1px solid #526772; color:#bbd9e6; font:500 10px/1.5 var(--sans); letter-spacing:.09em; text-transform:uppercase; }
+.catalog-entry .release-badge { margin-bottom:14px; }
+.catalog-entry[data-collection="caviar"] { --entry-accent:#bbd9e6; --entry-tint:rgb(187 217 230 / .055); --entry-etch:rgb(187 217 230 / .10); }
+.availability-panel[data-collection="caviar"] { --panel-accent:#bbd9e6; }
 .compact-catalog { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
 .catalog-entry {
   --entry-accent: var(--olive);

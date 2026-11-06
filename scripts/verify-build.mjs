@@ -2,6 +2,7 @@ import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { POLICY_VERSION } from '../src/data/policies.ts';
+import { getStrain, getAvailableOffer } from '../src/data/catalog.ts';
 const root = path.resolve("dist/client");
 async function walk(dir) {
   const files = await readdir(dir, { withFileTypes: true });
@@ -50,8 +51,21 @@ for (const file of pages) {
   const copy = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]*>/g,' ');
   assert.doesNotMatch(copy,/design preview|vista previa|placeholder|demo only|demostraci[oó]n|concept website|sitio conceptual|draft editorial|texto editorial provisional|details pending|not yet confirmed|on their way|llegar[aá]n pronto|Desert Selections|New Horizons/i,`${file}: unfinished public copy`);
   if (/\/(?:genetics|genetica)\/[^/]+\/index\.html$/.test(`/${relative}`)) {
-    assert.match(html,/data-add-offer=/,`${file}: variety cannot be ordered`);
-    assert.match(html,/(?:\$|USD\s*)60\.00/,`${file}: pack must cost $60`);
+    const strain=getStrain(relative.split('/').at(-2));
+    if(getAvailableOffer(strain.id)) {
+      assert.match(html,/data-add-offer=/,`${file}: available variety cannot be ordered`);
+      assert.match(html,/(?:\$|USD\s*)60\.00/,`${file}: pack must cost $60`);
+    } else {
+      assert.doesNotMatch(html,/data-add-offer=/,`${file}: upcoming variety must not be orderable`);
+      assert.match(html,/Coming soon|Próximamente/,`${file}: upcoming status is missing`);
+    }
+  }
+  if(['index.html','es/index.html','genetics/index.html','es/genetica/index.html'].includes(relative)) {
+    const cards=[...html.matchAll(/data-strain-card data-collection="([^"]+)"/g)].map(match=>match[1]);
+    assert.deepEqual(cards.slice(0,5),Array(5).fill('caviar'));
+    assert.equal(cards.length,23);
+    assert.match(html,/Winter is coming/);
+    assert.match(html,/Coming soon|Próximamente/);
   }
   if (['checkout/index.html','es/reserva/index.html'].includes(relative)) {
     const methods = [...html.matchAll(/<option value="(cashapp|apple_pay|cash|paypal|zelle)"/g)].map(match=>match[1]);
@@ -74,7 +88,7 @@ for (const file of pages) {
     references++;
   }
 }
-assert.equal(pages.length, 57);
+assert.equal(pages.length, 67);
 const deployment = JSON.parse(await readFile('.vercel/output/config.json','utf8'));
 for (const target of ['/genetics/','/es/genetica/']) {
   assert.ok(deployment.routes.some(route => route.headers?.Location === target), `Missing legacy redirect to ${target}`);

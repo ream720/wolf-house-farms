@@ -16,6 +16,7 @@ import {
   formatLineage,
   getCatalogLine,
   catalogLines,
+  catalogStrains,
 } from "../src/data/catalog.ts";
 
 test("cart rejects malformed data, unknown offers, duplicates, fractions and invalid quantities", () => {
@@ -73,7 +74,7 @@ test("checkout form requires complete contact, US address shape and acknowledgem
 });
 test("every public route has a unique English and Spanish equivalent", () => {
   const routes = allRoutes();
-  assert.equal(routes.length, 56);
+  assert.equal(routes.length, 66);
   assert.equal(new Set(routes.map((r) => r.path)).size, routes.length);
   for (const r of routes)
     assert.ok(
@@ -94,18 +95,20 @@ test("both interface languages are complete and catalog relationships are valid"
   );
   for (const language of Object.values(dictionaries))
     for (const value of Object.values(language)) assert.ok(value.trim());
-  assert.equal(strains.length, 18);
+  assert.equal(strains.length, 23);
   assert.equal(projects.length, 0);
   for (const s of strains) {
     assert.equal(s.project, undefined);
   }
   for (const o of offers) assert.ok(strains.find((s) => s.id === o.strain));
 });
-test('all 18 varieties have an available $60 pack with a stable unique SKU',()=>{
-  assert.equal(offers.length,18);
-  assert.equal(new Set(offers.map(offer=>offer.id)).size,18);
-  for (const strain of strains) {
-    assert.equal(strain.available,true);
+test('the 18 available varieties keep their $60 packs and all SKUs remain unique',()=>{
+  assert.equal(offers.length,23);
+  assert.equal(new Set(offers.map(offer=>offer.id)).size,23);
+  assert.ok(offers.every(offer=>offer.cents===6000));
+  const available = strains.filter(strain=>strain.available);
+  assert.equal(available.length,18);
+  for (const strain of available) {
     assert.equal(getAvailableOffer(strain.id)?.cents,6000);
     assert.equal(getAvailableOffer(strain.id)?.max,2);
   }
@@ -171,7 +174,7 @@ test("new breeder records preserve source crosses and confirmed parent roles", (
 });
 
 test("public pedigrees consistently group the female parent before the male parent", () => {
-  assert.deepEqual(strains.map(formatLineage), [
+  assert.deepEqual(strains.filter(s=>s.status!=='coming-soon').map(formatLineage), [
     "(Watermelon Sugaree x Grape Rainbow Pie) x (Cherry Runtz x BloodBerry Rain)",
     "(Zkittlez x Kush Mints) x (Cherry Runtz x BloodBerry Rain)",
     "(Jealousy x Apples and Bananas) x (Cherry Runtz x BloodBerry Rain)",
@@ -220,8 +223,8 @@ test("availability switches per variety without removing its catalog routes", ()
   for (const s of strains) assert.equal(typeof s.available, "boolean");
 });
 
-test("Plantz forms an independent third line with six bilingual variety routes", () => {
-  assert.deepEqual(catalogLines.map(line => line.id), ["original", "cherry-booberries", "plantz"]);
+test("Plantz remains an independent line with six bilingual variety routes", () => {
+  assert.deepEqual(catalogLines.map(line => line.id), ["caviar", "original", "cherry-booberries", "plantz"]);
   const members = strains.filter(s => getCatalogLine(s).id === "plantz");
   assert.deepEqual(members.map(s => s.mother), ["Bakerz Dozen", "Toronjaz", "Gary Payton x Zushi", "Lemon Zoap", "Maple Nectar", "Plantz"]);
   assert.equal(strains.filter(s => getCatalogLine(s).id === "original").length, 5);
@@ -235,5 +238,24 @@ test("Plantz forms an independent third line with six bilingual variety routes",
     assert.equal(s.name, formatLineage(s));
     for (const locale of ["en", "es"] as const)
       assert.ok(allRoutes().some(r => r.path === pathFor(locale, "strain", s.id)));
+  }
+});
+
+test('Winter is coming leads the catalog with five upcoming Caviar crosses',()=>{
+  const upcoming = strains.filter(s=>s.collection==='caviar');
+  const names = ['Gary Payton x Zushi x Caviar','Bakers Dozen x Caviar','Toronjaz x Caviar','Maple Nectar x Caviar','Plantz x Caviar'];
+  assert.deepEqual(upcoming.map(s=>s.name),names);
+  assert.deepEqual(catalogStrains.slice(0,5).map(s=>s.name),names);
+  for(const strain of upcoming) {
+    assert.equal(strain.status,'coming-soon');
+    assert.equal(strain.available,false);
+    assert.equal(strain.mother,undefined);
+    assert.equal(strain.father,undefined);
+    assert.equal(strain.seedType,undefined);
+    assert.equal(strain.suppliedLineage,strain.name);
+    assert.equal(getAvailableOffer(strain.id),undefined);
+    const offer=offers.find(o=>o.strain===strain.id)!;
+    assert.deepEqual(normalizeCart([{id:offer.id,quantity:1}]),[]);
+    for(const locale of ['en','es'] as const) assert.ok(allRoutes().some(r=>r.path===pathFor(locale,'strain',strain.id)));
   }
 });

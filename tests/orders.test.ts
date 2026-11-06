@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { buildOrderDetails, buildPublicOrderDetails, parsePayment, parseCustomer, paymentMethods, paymentMethodLabel, validateWorkflow, type Order } from '../src/lib/orders.ts';
 import { isCashByMailReady, paymentDestinations } from '../src/data/payments.ts';
 import { POLICY_VERSION } from '../src/data/policies.ts';
-import { strains,offers } from '../src/data/catalog.ts';
+import { strains,offers,isOfferAvailable } from '../src/data/catalog.ts';
 const customer = {name:'Test Customer',email:'test@example.com',address:'123 Test Street',city:'Fresno',state:'CA',zip:'93701'};
 const input = {customer,payment:{method:'cashapp',account:'$TestCustomer'},cart:[{id:'demo-sandia',quantity:1}]};
 
@@ -91,11 +91,24 @@ test('catalog price changes do not reprice an existing order',()=>{
   assert.equal(edit.total,7500);
 });
 test('checkout accepts one pack of every available variety at the $60 price',()=>{
-  const order=buildOrderDetails({...input,cart:offers.map(offer=>({id:offer.id,quantity:1}))});
+  const order=buildOrderDetails({...input,cart:offers.filter(isOfferAvailable).map(offer=>({id:offer.id,quantity:1}))});
   assert.equal(order.items.length,18);
   assert.ok(order.items.every(item=>item.unitCents===6000));
   assert.equal(order.subtotal,108000);
   assert.equal(order.total,109000);
+});
+
+test('upcoming Caviar varieties are rejected even if their availability flag is enabled',()=>{
+  for(const strain of strains.filter(s=>s.collection==='caviar')) {
+    const offer=offers.find(o=>o.strain===strain.id)!;
+    const cart=[{id:offer.id,quantity:1}];
+    assert.throws(()=>buildOrderDetails({...input,cart}),/unavailable/);
+    try {
+      strain.available=true;
+      assert.equal(isOfferAvailable(offer),false);
+      assert.throws(()=>buildOrderDetails({...input,cart}),/unavailable/);
+    } finally {strain.available=false;}
+  }
 });
 test('fulfillment requires verified payment and shipping requires tracking',()=>{
   validateWorkflow('pending','unfulfilled',''); validateWorkflow('requested','unfulfilled',''); validateWorkflow('paid','packing',''); validateWorkflow('paid','shipped','TEST123'); validateWorkflow('refunded','cancelled','');
