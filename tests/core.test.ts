@@ -160,7 +160,7 @@ test("new breeder records preserve source crosses and confirmed parent roles", (
     "Cherry Boo Berries x Cherry Boo Berries",
     "Gary Payton S1 x Cherry Boo Berries",
     "Sangria x Zcube x Cherry Boo Berries",
-    "Cereza black tuna x Cherry Boo Berries",
+    "Cereza Black Tuna x Cherry Boo Berries",
   ]);
   for (const s of batch) {
     assert.equal(s.status, "current");
@@ -186,7 +186,7 @@ test("public pedigrees consistently group the female parent before the male pare
     "Cherry Boo Berries x Cherry Boo Berries",
     "Gary Payton S1 x Cherry Boo Berries",
     "(Sangria x Zcube) x Cherry Boo Berries",
-    "Cereza black tuna x Cherry Boo Berries",
+    "Cereza Black Tuna x Cherry Boo Berries",
     "Bakerz Dozen x Plantz",
     "Toronjaz x Plantz",
     "(Gary Payton x Zushi) x Plantz",

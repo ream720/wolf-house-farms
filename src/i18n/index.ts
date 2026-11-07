@@ -187,8 +187,8 @@ const en = {
   notFoundBody:
     "This page is not in the archive. Let’s head back to familiar ground.",
   home: "Back home",
-  originalSelections: "Cherry Runtz x BloodBerry Rain line",
-  cherryBatch: "Cherry BooBerries line",
+  originalSelections: "Cherry Runtz x BloodBerry Rain",
+  cherryBatch: "Cherry BooBerries",
   plantzLine: "Plantz",
   winterLine: "Winter is coming",
   comingSoon: "Coming soon",
@@ -401,8 +401,8 @@ const es: typeof en = {
   notFoundBody:
     "Esta página no está en el archivo. Volvamos a un lugar conocido.",
   home: "Volver al inicio",
-  originalSelections: "Línea Cherry Runtz x BloodBerry Rain",
-  cherryBatch: "Línea Cherry BooBerries",
+  originalSelections: "Cherry Runtz x BloodBerry Rain",
+  cherryBatch: "Cherry BooBerries",
   plantzLine: "Plantz",
   winterLine: "Winter is coming",
   comingSoon: "Próximamente",

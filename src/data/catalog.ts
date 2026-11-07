@@ -166,7 +166,7 @@ const cherryBatch = [
   ["cherry-booberries-cherry-booberries", "Cherry Boo Berries", true],
   ["gary-payton-s1-cherry-booberries", "Gary Payton S1", true],
   ["sangria-zcube-cherry-booberries", "Sangria x Zcube", true],
-  ["cereza-black-tuna-cherry-booberries", "Cereza black tuna", true],
+  ["cereza-black-tuna-cherry-booberries", "Cereza Black Tuna", true],
 ] as const;
 for (const [index, [id, parent, available]] of cherryBatch.entries()) {
   const suppliedLineage = `${parent} x Cherry Boo Berries`;
