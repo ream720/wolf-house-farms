@@ -95,6 +95,10 @@ for (const file of pages) {
     }
   }
   if(['index.html','es/index.html','genetics/index.html','es/genetica/index.html'].includes(relative)) {
+    assert.match(html,/data-add-offer="pollen-plantz-2ml" disabled/);
+    assert.match(html,/2 mL/);
+    assert.match(html,/<p class="offer-price"><strong>\$200<\/strong><\/p>/);
+    assert.match(html,/<p>2 mL (?:per unit|por unidad)<\/p>/);
     const cards=[...html.matchAll(/data-strain-card data-collection="([^"]+)"/g)].map(match=>match[1]);
     assert.deepEqual(cards.slice(0,5),Array(5).fill('caviar'));
     assert.equal(cards.length,23);
@@ -102,6 +106,10 @@ for (const file of pages) {
     assert.match(html,/Coming soon|Próximamente/);
   }
   if (['checkout/index.html','es/reserva/index.html'].includes(relative)) {
+    assert.match(html,/select name="shippingMethod" required/);
+    assert.match(html,/<option value="standard">/);
+    assert.match(html,/<option value="expedited">/);
+    assert.match(copy,/30\.00/);
     const methods = [...html.matchAll(/<option value="(cashapp|apple_pay|cash|paypal|zelle)"/g)].map(match=>match[1]);
     assert.deepEqual(methods,['cashapp','apple_pay','cash']);
     assert.ok(html.includes('$Wolfhousegenetics'));

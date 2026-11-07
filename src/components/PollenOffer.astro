@@ -1,0 +1,17 @@
+---
+import { pollenOffer } from '../data/catalog';
+import { ui, type Locale } from '../i18n/index';
+import { pathFor } from '../lib/routes';
+import Icon from './Icon.astro';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = ui(locale);
+const price = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(pollenOffer.cents / 100);
+---
+<section class="wrap pollen-section" aria-labelledby="pollen-heading">
+  <p class="eyebrow">{t.limitedPollen}</p>
+  <div class="pollen-offer">
+    <div><h2 id="pollen-heading">{pollenOffer.name[locale]}</h2><p>{t.pollenDescription}</p><p class="payment-help" data-pollen-stock role="status">{t.checkingStock}</p></div>
+    <div class="pollen-purchase"><p class="offer-price"><strong>{price}</strong></p><button class="button" type="button" data-add-offer={pollenOffer.id} disabled>{t.addToBag}<Icon name="bag" size={18}/></button><a class="text-link" href={pathFor(locale,'checkout')}>{t.viewBag}<Icon size={17}/></a></div>
+  </div>
+</section>

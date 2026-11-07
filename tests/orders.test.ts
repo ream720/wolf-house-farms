@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { buildOrderDetails, buildPublicOrderDetails, parsePayment, parseCustomer, paymentMethods, paymentMethodLabel, validateWorkflow, type Order } from '../src/lib/orders.ts';
 import { isCashByMailReady, paymentDestinations } from '../src/data/payments.ts';
 import { POLICY_VERSION } from '../src/data/policies.ts';
-import { strains,offers,isOfferAvailable } from '../src/data/catalog.ts';
+import { strains,offers,seedOffers,pollenOffer,isOfferAvailable } from '../src/data/catalog.ts';
+import { shippingLabel } from '../src/data/shipping.ts';
 const customer = {name:'Test Customer',email:'test@example.com',address:'123 Test Street',city:'Fresno',state:'CA',zip:'93701'};
 const input = {customer,payment:{method:'cashapp',account:'$TestCustomer'},cart:[{id:'demo-sandia',quantity:1}]};
 
@@ -91,11 +92,32 @@ test('catalog price changes do not reprice an existing order',()=>{
   assert.equal(edit.total,7500);
 });
 test('checkout accepts one pack of every available variety at the $60 price',()=>{
-  const order=buildOrderDetails({...input,cart:offers.filter(isOfferAvailable).map(offer=>({id:offer.id,quantity:1}))});
+  const order=buildOrderDetails({...input,cart:seedOffers.filter(isOfferAvailable).map(offer=>({id:offer.id,quantity:1}))});
   assert.equal(order.items.length,18);
   assert.ok(order.items.every(item=>item.unitCents===6000));
   assert.equal(order.subtotal,108000);
   assert.equal(order.total,109000);
+});
+
+test('shipping defaults to $10, expedited is $30 total, and client prices are ignored',()=>{
+  assert.equal(buildOrderDetails(input).shipping,1000);
+  const expedited=buildOrderDetails({...input,shippingMethod:'expedited',shipping:1,total:1});
+  assert.equal(expedited.shipping,3000);
+  assert.equal(expedited.total,9000);
+  assert.match(shippingLabel(expedited.shipping),/Expedited/);
+  assert.match(shippingLabel(expedited.shipping,'es'),/exprés/);
+  assert.equal(buildOrderDetails({...input,shippingMethod:'standard'},expedited as Order).shipping,3000);
+  for(const shippingMethod of ['overnight','__proto__',null,3000,{}]) assert.throws(()=>buildOrderDetails({...input,shippingMethod}),/shipping service/);
+});
+
+test('pollen order snapshots preserve the $200 price and 2 mL units with mixed carts',()=>{
+  const cart=[{id:pollenOffer.id,quantity:4,unitCents:1},{id:'demo-sandia',quantity:1}];
+  const details=buildOrderDetails({...input,cart,shippingMethod:'expedited'});
+  assert.deepEqual(details.items[0],{id:pollenOffer.id,strain:pollenOffer.strain,name:'Plantz pollen',pack:'2 mL pollen per unit',quantity:4,unitCents:20000});
+  assert.equal(details.subtotal,86000);
+  assert.equal(details.total,89000);
+  assert.throws(()=>buildOrderDetails({...input,cart:[{id:pollenOffer.id,quantity:5}]}),/quantity limit/);
+  assert.equal(buildOrderDetails({...input,cart},details as Order).items[0].unitCents,20000);
 });
 
 test('upcoming Caviar varieties are rejected even if their availability flag is enabled',()=>{

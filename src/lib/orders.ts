@@ -1,4 +1,5 @@
-import { offers, getStrain, isOfferAvailable, SHIPPING_CENTS } from '../data/catalog.ts';
+import { offers, offerName, offerPack, isOfferAvailable } from '../data/catalog.ts';
+import { shippingMethods, isShippingMethod } from '../data/shipping.ts';
 import { validCheckoutForm, type CartItem } from './reservation.ts';
 import { POLICY_VERSION, policyUI } from '../data/policies.ts';
 import { isCashByMailReady } from '../data/payments.ts';
@@ -78,10 +79,11 @@ export function buildOrderDetails(raw: Record<string, unknown>, previous?: Order
       return { ...old, quantity: item.quantity };
     }
     if (!offer || !isOfferAvailable(offer) || item.quantity > offer.max) throw new OrderError('A selection is unavailable or exceeds its quantity limit.');
-    return { id: offer.id, strain: offer.strain, name: getStrain(offer.strain).name, pack: '10 seeds per pack', quantity: item.quantity, unitCents: offer.cents };
+    return { id: offer.id, strain: offer.strain, name: offerName(offer), pack: offerPack(offer), quantity: item.quantity, unitCents: offer.cents };
   });
   const subtotal = items.reduce((sum, item) => sum + item.unitCents * item.quantity, 0);
-  const shipping = previous?.shipping ?? SHIPPING_CENTS;
+  if (raw.shippingMethod !== undefined && !isShippingMethod(raw.shippingMethod)) throw new OrderError('Choose a supported shipping service.');
+  const shipping = previous?.shipping ?? shippingMethods[isShippingMethod(raw.shippingMethod) ? raw.shippingMethod : 'standard'];
   return { customer, payment, items, subtotal, shipping, total: subtotal + shipping };
 }
 /** Admin edits never rewrite the original agreement. */

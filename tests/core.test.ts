@@ -11,6 +11,10 @@ import {
   projects,
   strains,
   offers,
+  seedOffers,
+  pollenOffer,
+  offerName,
+  offerPack,
   SHOW_PROJECTS,
   getAvailableOffer,
   formatLineage,
@@ -100,12 +104,12 @@ test("both interface languages are complete and catalog relationships are valid"
   for (const s of strains) {
     assert.equal(s.project, undefined);
   }
-  for (const o of offers) assert.ok(strains.find((s) => s.id === o.strain));
+  for (const o of seedOffers) assert.ok(strains.find((s) => s.id === o.strain));
 });
 test('the 18 available varieties keep their $60 packs and all SKUs remain unique',()=>{
-  assert.equal(offers.length,23);
-  assert.equal(new Set(offers.map(offer=>offer.id)).size,23);
-  assert.ok(offers.every(offer=>offer.cents===6000));
+  assert.equal(seedOffers.length,23);
+  assert.equal(new Set(offers.map(offer=>offer.id)).size,24);
+  assert.ok(seedOffers.every(offer=>offer.cents===6000));
   const available = strains.filter(strain=>strain.available);
   assert.equal(available.length,18);
   for (const strain of available) {
@@ -113,6 +117,19 @@ test('the 18 available varieties keep their $60 packs and all SKUs remain unique
     assert.equal(getAvailableOffer(strain.id)?.max,2);
   }
   assert.equal(getAvailableOffer('la-sandia')?.id,'demo-sandia');
+});
+
+test('pollen uses a separate two-milliliter unit at $200, capped at four units',()=>{
+  assert.equal(pollenOffer.cents,20000);
+  assert.equal(pollenOffer.stock,4);
+  assert.equal(offerName(pollenOffer),'Plantz pollen');
+  assert.equal(offerName(pollenOffer,'es'),'Polen de Plantz');
+  assert.match(offerPack(pollenOffer),/2 mL/);
+  assert.deepEqual(normalizeCart([{id:pollenOffer.id,quantity:4}]),[{id:pollenOffer.id,quantity:4}]);
+  assert.deepEqual(normalizeCart([{id:pollenOffer.id,quantity:5}]),[]);
+  const cart=[{id:pollenOffer.id,quantity:1},{id:'demo-sandia',quantity:1}];
+  assert.deepEqual(calculateTotals(cart,{shippingMethod:'expedited'}),{subtotal:26000,shipping:3000,total:29000});
+  assert.deepEqual(calculateTotals([],{shippingMethod:'expedited'}),{subtotal:0,shipping:0,total:0});
 });
 
 test("supplied artwork parent roles and limited seed-type evidence are preserved", () => {

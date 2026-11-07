@@ -18,6 +18,7 @@ export const PATCH: APIRoute = async context => {
     const itemsChanged = details.items.length !== order.items.length || details.items.some((item,index) => item.id !== order.items[index].id || item.quantity !== order.items[index].quantity);
     if (['shipped','delivered'].includes(order.fulfillment_status) && (customerChanged || itemsChanged)) throw new OrderError('Shipped orders retain their delivery address and items.');
     const {data,error: updateError} = await db.rpc('whf_update_order',{p_id:order.id,p_version:raw.version,p_actor:user.id,p_details:{...details,payment_status:raw.payment_status,fulfillment_status:raw.fulfillment_status,tracking,carrier,notes}});
+    if (updateError?.message.includes('stock_unavailable')) throw new OrderError('There is not enough Plantz pollen remaining. Reduce the quantity before saving.',409);
     if (updateError) throw new OrderError(updateError.message.includes('version_conflict') ? 'This order changed. Reload it before saving.' : 'Could not save the order.',updateError.message.includes('version_conflict') ? 409:503);
     return json({order:data});
   } catch(error) { return failure(error); }

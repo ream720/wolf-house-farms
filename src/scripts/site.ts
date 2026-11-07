@@ -1,6 +1,7 @@
 import { initializeAgeEntry } from "../lib/age-entry";
 import { ui, money, type Locale } from "../i18n/index";
-import { offers, getStrain, isOfferAvailable } from "../data/catalog";
+import { offers, getStrain, isOfferAvailable, offerName, offerPack, pollenOffer } from "../data/catalog";
+import { isShippingMethod, shippingLabel } from '../data/shipping';
 import {
   normalizeCart,
   calculateTotals,
@@ -56,6 +57,7 @@ for (const [storageName, oldKey, newKey] of [
 }
 
 let cart: CartItem[] = [];
+let pollenRemaining = 0;
 try {
   cart = normalizeCart(read(localStorage, CART_KEY));
 } catch {}
@@ -176,6 +178,7 @@ document
       const offer = offers.find((o) => o.id === button.dataset.addOffer);
       if (!offer || !isOfferAvailable(offer)) return;
       const existing = cart.find((i) => i.id === offer.id);
+      if (offer.id === pollenOffer.id && (existing?.quantity ?? 0) >= pollenRemaining) return notify(t.pollenStockError);
       if (existing && existing.quantity >= offer.max)
         return notify(t.limitError);
       if (existing) existing.quantity++;
@@ -239,8 +242,8 @@ function renderSummary() {
     img.width = 65;
     img.height = 80;
     const copy = element("div");
-    const name = snapshot?.name || strain.name;
-    copy.append(element("h3", "", name), element("p", "", snapshot?.pack || t.packSize));
+    const name = snapshot?.name || offerName(offer!,locale);
+    copy.append(element("h3", "", name), element("p", "", snapshot?.pack || offerPack(offer!,locale)));
     if (!isConfirmation) {
       const controls = element("div", "quantity-controls");
       const input = element("input");
@@ -249,7 +252,7 @@ function renderSummary() {
       input.max = String(offer!.max);
       input.step = "1";
       input.value = String(item.quantity);
-      input.setAttribute("aria-label", `${t.quantity}: ${strain.name}`);
+      input.setAttribute("aria-label", `${t.quantity}: ${name}`);
       input.addEventListener("change", () => {
         const value = Number(input.value);
         if (!Number.isInteger(value) || value < 1 || value > offer!.max) {
@@ -263,7 +266,7 @@ function renderSummary() {
       });
       const remove = element("button", "", t.remove);
       remove.type = "button";
-      remove.setAttribute("aria-label", `${t.remove}: ${strain.name}`);
+      remove.setAttribute("aria-label", `${t.remove}: ${name}`);
       remove.addEventListener("click", () => {
         cart = cart.filter((i) => i.id !== item.id);
         updateCart();
@@ -279,9 +282,11 @@ function renderSummary() {
     );
     list.append(row);
   }
-  const totals = isConfirmation && confirmation ? confirmation : calculateTotals(cart);
+  const selectedShipping = (form?.elements.namedItem('shippingMethod') as HTMLSelectElement | null)?.value;
+  const totals = isConfirmation && confirmation ? confirmation : calculateTotals(cart, {shippingMethod: isShippingMethod(selectedShipping) ? selectedShipping : 'standard'});
   $("[data-subtotal]")!.textContent = money(totals.subtotal, locale);
   $("[data-shipping]")!.textContent = money(totals.shipping, locale);
+  $('[data-shipping-label]')!.textContent = shippingLabel(totals.shipping,locale);
   $("[data-total]")!.textContent = money(totals.total, locale);
   if (isConfirmation && confirmation)
     $("[data-reference]")!.textContent = confirmation.reference;
@@ -305,6 +310,7 @@ const draftFields = [
   "zip",
   "paymentMethod",
   "paymentAccount",
+  "shippingMethod",
 ] as const;
 function saveDraft() {
   if (!form) return;
@@ -352,6 +358,9 @@ if (form) {
           );
     }
   } catch {}
+  const shippingSelect = form.elements.namedItem('shippingMethod') as HTMLSelectElement;
+  if (!isShippingMethod(shippingSelect.value)) shippingSelect.value = 'standard';
+  shippingSelect.addEventListener('change',renderSummary);
   updatePaymentHelp();
   method.addEventListener('change',updatePaymentHelp);
   account.addEventListener('input',()=>account.setCustomValidity(''));
@@ -387,7 +396,7 @@ if (form) {
     submitting = true; button.disabled = true; button.textContent = t.submitting;
     error.hidden = true;
     try {
-      const payload = {customer:Object.fromEntries(['name','email','address','city','state','zip'].map(k=>[k,data[k]])),payment:{method:data.paymentMethod,account:data.paymentAccount},cart,terms:data.terms,policyVersion:POLICY_VERSION,locale};
+      const payload = {customer:Object.fromEntries(['name','email','address','city','state','zip'].map(k=>[k,data[k]])),payment:{method:data.paymentMethod,account:data.paymentAccount},shippingMethod:data.shippingMethod,cart,terms:data.terms,policyVersion:POLICY_VERSION,locale};
       const fingerprint = JSON.stringify({...payload,locale:undefined});
       const prior = read(sessionStorage,REQUEST_KEY) as {fingerprint?:string;id?:string} | null;
       const requestId = prior?.fingerprint === fingerprint && prior.id ? prior.id : crypto.randomUUID();
@@ -395,7 +404,10 @@ if (form) {
       clear(sessionStorage,'whf-storage-check');
       const response = await fetch('/api/orders/',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(20000),body:JSON.stringify({...payload,requestId})});
       const result = await response.json();
-      if (!response.ok) throw new Error(response.status === 503 ? t.orderUnavailable : response.status === 429 ? t.orderRateLimit : t.orderError);
+      if (!response.ok) {
+        if (response.status === 409 && result.code === 'stock_unavailable') { void refreshPollenStock(); throw new Error(t.pollenStockError); }
+        throw new Error(response.status === 503 ? t.orderUnavailable : response.status === 429 ? t.orderRateLimit : t.orderError);
+      }
       const receipt = result.confirmation as Confirmation;
       if (!write(sessionStorage,CONFIRM_KEY,receipt)) {
         error.textContent=`${t.orderSaved} ${receipt.reference}. ${t.storageError}`; error.hidden=false;
@@ -406,7 +418,7 @@ if (form) {
       clear(sessionStorage,REQUEST_KEY);
       location.assign(pathFor(locale, "confirmation"));
     } catch (failure) {
-      error.textContent=failure instanceof Error && [t.storageError,t.orderUnavailable,t.orderRateLimit,t.orderError].includes(failure.message) ? failure.message : t.orderError;
+      error.textContent=failure instanceof Error && [t.storageError,t.orderUnavailable,t.orderRateLimit,t.orderError,t.pollenStockError].includes(failure.message) ? failure.message : t.orderError;
       error.hidden=false;
     } finally {submitting=false;updatePaymentHelp();}
   });
@@ -438,3 +450,21 @@ window.addEventListener("pageshow", () => {
   renderSummary();
 });
 renderSummary();
+async function refreshPollenStock() {
+  const buttons = document.querySelectorAll<HTMLButtonElement>(`[data-add-offer="${pollenOffer.id}"]`);
+  if (isConfirmation || (!buttons.length && !cart.some(item => item.id === pollenOffer.id))) return;
+  try {
+    const response = await fetch('/api/inventory/',{signal:AbortSignal.timeout(10000),cache:'no-store'});
+    const result = await response.json();
+    if (!response.ok || !Number.isInteger(result.remaining) || result.remaining < 0 || result.remaining > pollenOffer.stock) throw new Error();
+    pollenRemaining = result.remaining;
+    for (const button of buttons) { button.disabled = !pollenRemaining; button.textContent = pollenRemaining ? t.addToBag : t.soldOut; }
+    for (const label of document.querySelectorAll<HTMLElement>('[data-pollen-stock]')) label.textContent = pollenRemaining ? `${pollenRemaining} ${t.unitsAvailable}` : t.soldOut;
+  } catch {
+    pollenRemaining = 0;
+    for (const button of buttons) button.disabled = true;
+    for (const label of document.querySelectorAll<HTMLElement>('[data-pollen-stock]')) label.textContent = t.stockUnavailable;
+  }
+}
+void refreshPollenStock();
+window.addEventListener('pageshow', event => { if (event.persisted) void refreshPollenStock(); });

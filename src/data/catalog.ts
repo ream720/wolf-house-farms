@@ -244,17 +244,31 @@ export const getStrain = (id: string) => strains.find((s) => s.id === id)!;
 export const PACK_PRICE_CENTS = 6000;
 export const MAX_PACKS_PER_VARIETY = 2;
 export const SHIPPING_CENTS = 1000;
+export const pollenOffer = {
+  id: 'pollen-plantz-2ml', strain: 'plantz-pollen', name: text('Plantz pollen', 'Polen de Plantz'),
+  pack: text('2 mL pollen per unit', '2 mL de polen por unidad'),
+  cents: 20000, max: 4, stock: 4,
+};
+export interface Offer { id: string; strain: string; cents: number; max: number }
 // Preserve the three existing SKU values for saved orders and customers' baskets.
 const establishedOfferIds: Record<string,string> = {
   'la-sandia': 'demo-sandia', 'cherry-zushi': 'demo-cherry', 'albany-chocolate': 'demo-albany',
 };
-export const offers = strains.map(strain => ({
+export const seedOffers = strains.map(strain => ({
   id: establishedOfferIds[strain.id] || `pack-${strain.id}`,
   strain: strain.id, cents: PACK_PRICE_CENTS, max: MAX_PACKS_PER_VARIETY,
 }));
+export const offers: Offer[] = [...seedOffers, pollenOffer];
+export function offerName(offer: Offer, locale: 'en' | 'es' = 'en') {
+  return offer.id === pollenOffer.id ? pollenOffer.name[locale] : getStrain(offer.strain).name;
+}
+export function offerPack(offer: Offer, locale: 'en' | 'es' = 'en') {
+  return offer.id === pollenOffer.id ? pollenOffer.pack[locale] : locale === 'es' ? '10 semillas por paquete' : '10 seeds per pack';
+}
 
 // No release schedule: reservation eligibility belongs to each variety.
 export function isOfferAvailable(offer: (typeof offers)[number]): boolean {
+  if (offer.id === pollenOffer.id) return true; // Live stock is allocated atomically by the database.
   const strain = strains.find(s => s.id === offer.strain);
   return strain?.available === true && strain.status !== 'coming-soon';
 }

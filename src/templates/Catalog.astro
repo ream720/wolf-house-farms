@@ -2,6 +2,7 @@
 import { ui, type Locale } from '../i18n/index';
 import { catalogStrains as strains, catalogLines } from '../data/catalog';
 import StrainCard from '../components/StrainCard.astro';
+import PollenOffer from '../components/PollenOffer.astro';
 interface Props { locale: Locale } const { locale } = Astro.props; const t = ui(locale);
 ---
 <section class="page-intro wrap"><p class="eyebrow">{t.catalogEyebrow}</p><h1>{t.catalogTitle}</h1><p class="page-lead">{t.catalogIntro}</p></section>
@@ -13,3 +14,4 @@ interface Props { locale: Locale } const { locale } = Astro.props; const t = ui(
   <div class="strain-grid compact-catalog">{strains.map(strain => <StrainCard strain={strain} locale={locale}/>)}</div>
   <div class="empty-state" data-no-results hidden><h2>{t.noResults}</h2><button class="button button-outline" data-reset-filters>{t.clearFilters}</button></div>
 </section>
+<PollenOffer locale={locale}/>

@@ -11,6 +11,7 @@ export const POST: APIRoute = async context => {
     const details = buildPublicOrderDetails(raw);
     const db = database();
     const {data,error} = await db.rpc('whf_submit_order',{p_request_id:raw.requestId,p_details:details,p_locale:raw.locale === 'es' ? 'es':'en',p_rate_key:await rateKey(context)});
+    if (error?.message.includes('stock_unavailable')) return json({code:'stock_unavailable',error:'There is not enough Plantz pollen remaining for this quantity.'},409);
     if (error) throw new OrderError(error.message.includes('rate_limit') ? 'Too many submissions. Please try again in an hour.' : 'Your order could not be saved. Please retry.',error.message.includes('rate_limit') ? 429:503);
     return json({confirmation:data},201);
   } catch(error) { return failure(error); }

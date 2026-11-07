@@ -58,11 +58,15 @@ A new backend requires the schema and administrator membership to be configured 
 - Durable order storage, retry protection and saved original order details.
 - Approved-user administration for order edits, fulfillment, tracking, packing slips and change history.
 
-Payment collection and customer communication are manual. The site does not process payments or automatically send invoices or customer emails. Availability is configured in source; finite inventory allocation and stock management are not implemented.
+Payment collection and customer communication are manual. The site does not process payments or automatically send invoices or customer emails. Seed availability is configured in source. Plantz pollen is a separate limited offer: four 2 mL units at $200 USD each. Its live stock is held atomically when an order is saved, including unpaid reservations; cancellation, removal, and quantity reductions release stock. Administrators must cancel abandoned pollen reservations to release them. Fulfilled orders continue to count against the release quantity.
 
 Checkout offers Cash App, Apple Pay, and cash by mail. The Cash App destination is `$Wolfhousegenetics`; the Apple Pay phone is `209-404-9891`. Mailed cash uses Wolf House Farms, 1700 McHenry Ave Ste 65B PMB166, Modesto, CA 95350. The app collects the customer's payment contact for digital methods; cash requires no payment-app account. Earlier PayPal and Zelle orders retain their original method and can still be managed.
 
 The existing WHF database has the `allow_cash_by_mail_payment` migration applied. For another existing database, apply `supabase/enable-cash-by-mail.sql` before enabling cash (do not reapply the bootstrap schema). Public payment destinations are maintained in `src/data/payments.ts`. If the mailing address is cleared or incomplete, new cash reservations are blocked automatically.
+
+US shipping offers standard service at $10 or expedited service at $30 total per order. Checkout calculates the selected rate on the server and preserves it on receipts and existing admin orders. No delivery time is promised.
+
+The existing WHF database has the `limited_pollen_inventory` migration applied. For another existing backend, apply `supabase/migrations/20261107031809_limited_pollen_inventory.sql` once. Do not reapply `supabase/schema.sql`. New backends use the updated bootstrap schema. The stock table is server-only; `/api/inventory/` exposes only the remaining pollen quantity. `supabase/verify-pollen.sql` verifies allocation, retries, edits, cancellation and sold-out rejection using fixtures that are rolled back.
 
 ## Content and assets
 

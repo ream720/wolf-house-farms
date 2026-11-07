@@ -1,4 +1,5 @@
-import { offers, isOfferAvailable, SHIPPING_CENTS } from "../data/catalog.ts";
+import { offers, isOfferAvailable } from "../data/catalog.ts";
+import { shippingMethods, type ShippingMethod } from '../data/shipping.ts';
 export interface CartItem {
   id: string;
   quantity: number;
@@ -22,14 +23,14 @@ export function normalizeCart(raw: unknown, { allowUnavailable = false } = {}): 
     return [{ id: offer.id, quantity: item.quantity }];
   });
 }
-export function calculateTotals(cart: CartItem[], options = { allowUnavailable: false }) {
+export function calculateTotals(cart: CartItem[], options: { allowUnavailable?: boolean; shippingMethod?: ShippingMethod } = {}) {
   const clean = normalizeCart(cart, options);
   const subtotal = clean.reduce(
     (sum, item) =>
       sum + offers.find((o) => o.id === item.id)!.cents * item.quantity,
     0,
   );
-  const shipping = clean.length ? SHIPPING_CENTS : 0;
+  const shipping = clean.length ? shippingMethods[options.shippingMethod ?? 'standard'] : 0;
   return { subtotal, shipping, total: subtotal + shipping };
 }
 export function validCheckoutForm(data: Record<string, string | boolean>) {
