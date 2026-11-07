@@ -10,6 +10,7 @@ import {
 import { pathFor } from "../lib/routes";
 import { paymentMethodLabel, parsePayment, type OrderItem, type OrderDetails } from '../lib/orders';
 import { isCashByMailReady } from '../data/payments';
+import { confirmationInstructions } from '../lib/confirmation';
 import { POLICY_VERSION } from '../data/policies';
 
 const locale: Locale = document.body.dataset.locale === "es" ? "es" : "en";
@@ -287,6 +288,11 @@ function renderSummary() {
   if (isConfirmation && confirmation?.payment) {
     const payment = confirmation.payment;
     $('[data-confirmation-payment]')!.textContent = `${t.paymentMethod}: ${paymentMethodLabel(payment.method,locale)}${payment.account ? ` · ${payment.account}` : ''}`;
+    const instructions = confirmationInstructions(payment.method,locale);
+    $('[data-confirmation-instructions-title]')!.textContent = instructions.title;
+    $('[data-confirmation-instructions-body]')!.textContent = instructions.body;
+    const address = $('[data-confirmation-mail-address]');
+    if(address) address.hidden = !instructions.showMailingAddress;
   }
 }
 

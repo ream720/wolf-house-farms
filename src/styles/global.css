@@ -2495,6 +2495,13 @@ select option { background: #1d1d22; }
 
 .checkout-intro { padding-block: 36px 32px; }
 .checkout-intro .page-lead { margin-top: 0; }
+.confirmation-intro { padding-block:28px 24px; }
+.confirmation-intro h1 { margin-top:8px; font-size:clamp(36px,4vw,52px); line-height:1.1; }
+.confirmation-intro .page-lead { margin-top:8px; font-size:14px; line-height:1.6; }
+.confirmation-mailing-address { margin-top:18px; padding:18px 20px; border:1px solid var(--line); }
+.confirmation-mailing-address h4 { font:500 11px/1.5 var(--sans); color:var(--muted); margin-bottom:8px; }
+.confirmation-mailing-address address { font:400 14px/1.7 var(--sans); overflow-wrap:anywhere; }
+@media print { .confirmation-intro { padding-block:0 16px; } }
 .contact-links { display:grid; gap:24px; margin-block:28px 36px; overflow-wrap:anywhere; }
 .contact-links p { display:grid; gap:8px; margin:0; }
 .contact-links .eyebrow { color:var(--muted); }

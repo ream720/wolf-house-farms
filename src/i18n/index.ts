@@ -163,9 +163,14 @@ const en = {
   paymentStatus: "No payment collected",
   noEmail:
     "No confirmation email will be sent. Take a screenshot, save, or print this page to keep your confirmation details.",
-  nextSteps: "Payment instructions come next",
+  nextSteps: "Wait for your payment request",
   nextStepsBody:
-    "Wolf House Farms will confirm your order and coordinate payment using your chosen method. Wait for the team’s payment request or confirmed mailing instructions before sending funds. Keep your reference for payment and any questions about your order.",
+    "Wait for Wolf House Farms to send your payment request before sending payment. Keep your order # for any questions about your order.",
+  cashAppNextStepsBody: "Wait for Wolf House Farms to send a payment request to your Cash App account before sending payment.",
+  applePayNextStepsBody: "Wait for Wolf House Farms to contact you with an Apple Pay payment request before sending payment.",
+  cashMailNextSteps: "Mail your payment",
+  cashMailNextStepsBody: "Mail payment as soon as possible to the address below. Include order # with payment.",
+  mailPaymentTo: "Mail payment to",
   print: "Print / save confirmation",
   browseMore: "Browse more selections",
   noConfirmation: "There is no confirmation in this browser session.",
@@ -180,7 +185,7 @@ const en = {
     "Your age confirmation and unfinished checkout are stored in this tab’s session. Your bag and language preference are saved in this browser. Submitting a reservation shares your name, email, US delivery address, payment preference and payment account contact with Wolf House Farms to manage the order and coordinate payment. Orders and their change history are stored in Supabase and accessed by approved WHF administrators. The website uses Vercel hosting. Your confirmation, including payment contact, stays in this tab’s session until you clear it or the session ends. We do not collect payment passwords, card numbers or bank details, and no marketing or analytics services are configured. Contact Wolf House Farms with questions about your order or personal information.",
   orderingTitle: "Reservations & shipping.",
   orderingBody:
-    "Available catalog varieties can be reserved at $60 USD per 10-seed pack, with a limit of two packs per variety per order. Collections marked Coming soon are not open for reservations. US shipping is $10 per order. Add your selections to the bag and provide your contact and delivery details. WHF accepts Cash App, Apple Pay, and cash by mail only. For payment apps, include your registered username, email, or phone. Apple Pay coordination uses Apple Cash in Messages. Cash by mail is available using the mailing address shown at checkout; no payment-app account is needed for cash. No payment is taken at checkout. Wait for WHF to confirm your order and provide payment or mailing instructions. Include your order reference with mailed payment. Payment is verified before fulfillment. Save the on-screen confirmation and reference; automatic confirmation emails are not sent. A reservation is subject to WHF’s availability confirmation and does not automatically allocate finite stock. Contact WHF before paying if you need to change or cancel a reservation.",
+    "Available catalog varieties can be reserved at $60 USD per 10-seed pack, with a limit of two packs per variety per order. Collections marked Coming soon are not open for reservations. US shipping is $10 per order. Add your selections to the bag and provide your contact and delivery details. WHF accepts Cash App, Apple Pay, and cash by mail only. For payment apps, include your registered username, email, or phone. Apple Pay coordination uses Apple Cash in Messages. Cash by mail is available using the mailing address shown at checkout; no payment-app account is needed for cash. No payment is taken at checkout. For Cash App or Apple Pay, wait for WHF’s payment request. For cash by mail, send payment as soon as possible and include your order #. Payment is verified before fulfillment. Save the on-screen confirmation and reference; automatic confirmation emails are not sent. A reservation is subject to WHF’s availability confirmation and does not automatically allocate finite stock. Contact WHF before paying if you need to change or cancel a reservation.",
   footerTagline: "De raíz. From the root.",
   footerNote: "Preservation · Culture · Genetics",
   notFoundTitle: "A little off the trail.",
@@ -376,9 +381,14 @@ const es: typeof en = {
   paymentStatus: "No se ha cobrado ningún pago",
   noEmail:
     "No se enviará un correo de confirmación. Haz una captura de pantalla, guarda o imprime esta página para conservar los detalles de tu confirmación.",
-  nextSteps: "El siguiente paso son las instrucciones de pago",
+  nextSteps: "Espera tu solicitud de pago",
   nextStepsBody:
-    "Wolf House Farms confirmará tu pedido y coordinará el pago mediante el método elegido. Espera la solicitud de pago o las instrucciones postales confirmadas del equipo antes de enviar dinero. Conserva tu referencia para el pago y cualquier consulta sobre tu pedido.",
+    "Espera a que Wolf House Farms envíe tu solicitud de pago antes de pagar. Conserva tu número de pedido para cualquier consulta.",
+  cashAppNextStepsBody: "Espera a que Wolf House Farms envíe una solicitud de pago a tu cuenta de Cash App antes de pagar.",
+  applePayNextStepsBody: "Espera a que Wolf House Farms te contacte con una solicitud de pago de Apple Pay antes de pagar.",
+  cashMailNextSteps: "Envía tu pago por correo",
+  cashMailNextStepsBody: "Envía el pago lo antes posible a la dirección que aparece abajo. Incluye el número de pedido con el pago.",
+  mailPaymentTo: "Envía el pago a",
   print: "Imprimir / guardar confirmación",
   browseMore: "Explorar más selecciones",
   noConfirmation:
@@ -394,7 +404,7 @@ const es: typeof en = {
     "Tu confirmación de edad y el formulario pendiente se guardan en la sesión de esta pestaña. Tu bolsa y preferencia de idioma se guardan en este navegador. Al enviar una reserva compartes tu nombre, correo, dirección de entrega en EE. UU., método de pago y contacto de la cuenta con Wolf House Farms para gestionar el pedido y coordinar el pago. Los pedidos y su historial se guardan en Supabase y solo los administradores autorizados de WHF pueden acceder a ellos. El sitio utiliza alojamiento de Vercel. Tu confirmación, incluido el contacto de pago, permanece en la sesión de esta pestaña hasta que la borres o termine la sesión. No recopilamos contraseñas de pago, números de tarjeta ni datos bancarios, y no hay servicios de marketing ni analítica configurados. Contacta a Wolf House Farms si tienes preguntas sobre tu pedido o tus datos personales.",
   orderingTitle: "Reservas y envíos.",
   orderingBody:
-    "Las variedades disponibles del catálogo se pueden reservar a $60 USD por paquete de 10 semillas, con un límite de dos paquetes por variedad en cada pedido. Las colecciones marcadas Próximamente aún no aceptan reservas. El envío en EE. UU. cuesta $10 por pedido. Añade tus selecciones a la bolsa e introduce tus datos de contacto y entrega. WHF solo acepta Cash App, Apple Pay y efectivo por correo. Para las aplicaciones, incluye tu usuario, correo o teléfono registrado. Apple Pay se coordina mediante Apple Cash en Mensajes. El efectivo por correo está disponible mediante la dirección postal indicada al reservar; no requiere una cuenta de pago. No se cobra al enviar la reserva. Espera a que WHF confirme tu pedido y facilite las instrucciones de pago o envío del efectivo. Incluye la referencia del pedido con el pago por correo. El pago se verifica antes de preparar el envío. Guarda la confirmación y referencia en pantalla; no se envían correos automáticos de confirmación. La reserva está sujeta a la confirmación de disponibilidad de WHF y no asigna existencias limitadas automáticamente. Contacta a WHF antes de pagar si necesitas cambiar o cancelar la reserva.",
+    "Las variedades disponibles del catálogo se pueden reservar a $60 USD por paquete de 10 semillas, con un límite de dos paquetes por variedad en cada pedido. Las colecciones marcadas Próximamente aún no aceptan reservas. El envío en EE. UU. cuesta $10 por pedido. Añade tus selecciones a la bolsa e introduce tus datos de contacto y entrega. WHF solo acepta Cash App, Apple Pay y efectivo por correo. Para las aplicaciones, incluye tu usuario, correo o teléfono registrado. Apple Pay se coordina mediante Apple Cash en Mensajes. El efectivo por correo está disponible mediante la dirección postal indicada al reservar; no requiere una cuenta de pago. No se cobra al enviar la reserva. Para Cash App o Apple Pay, espera la solicitud de pago de WHF. Si pagas en efectivo por correo, envía el pago lo antes posible e incluye tu número de pedido. El pago se verifica antes de preparar el envío. Guarda la confirmación y referencia en pantalla; no se envían correos automáticos de confirmación. La reserva está sujeta a la confirmación de disponibilidad de WHF y no asigna existencias limitadas automáticamente. Contacta a WHF antes de pagar si necesitas cambiar o cancelar la reserva.",
   footerTagline: "De raíz. Desde el origen.",
   footerNote: "Preservación · Cultura · Genética",
   notFoundTitle: "Fuera del sendero.",
