@@ -96,3 +96,6 @@ export function allRoutes() {
   }
   return routes;
 }
+export function isIndexablePage(page: Page): boolean {
+  return page !== 'checkout' && page !== 'confirmation';
+}

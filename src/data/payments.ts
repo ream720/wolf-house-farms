@@ -10,7 +10,7 @@ export interface CashMailAddress {
 // than publishing a sample phone number or a fictional mailing address.
 export const paymentDestinations = {
   cashAppCashtag: '$Wolfhousegenetics',
-  applePayPhone: '',
+  applePayPhone: '209-404-9891',
   cashMailAddress: {
     recipient: 'Wolf House Farms',
     poBox: '1700 McHenry Ave Ste 65B PMB166',

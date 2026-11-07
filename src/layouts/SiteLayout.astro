@@ -9,11 +9,13 @@ import '../styles/global.css';
 import Icon from '../components/Icon.astro';
 import AgeGate from '../components/AgeGate.astro';
 import { ui, type Locale } from '../i18n/index';
-import { pathFor, type Page } from '../lib/routes';
+import { pathFor, isIndexablePage, type Page } from '../lib/routes';
 import { SHOW_PROJECTS } from '../data/catalog';
 import { policyPages, policyUI } from '../data/policies';
-interface Props { locale: Locale; page: Page; slug?: string; title: string; description?: string; }
-const { locale, page, slug = '', title, description } = Astro.props;
+interface Props { locale: Locale; page: Page; slug?: string; title: string; description?: string; noindex?: boolean; }
+const { locale, page, slug = '', title, description, noindex = false } = Astro.props;
+const indexable = !noindex && isIndexablePage(page);
+const pageUrl = (language: Locale) => new URL(pathFor(language, page, slug), Astro.site);
 const t = ui(locale);
 const nav = SHOW_PROJECTS ? ['genetics', 'work', 'story'] as const : ['genetics', 'story'] as const;
 const current = page === 'strain' ? 'genetics' : page === 'project' ? 'work' : page;
@@ -26,11 +28,15 @@ const p = policyUI[locale];
     <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>{title === 'Wolf House Farms' ? title : `${title} — Wolf House Farms`}</title>
     <meta name="description" content={description || t.heroIntro}/>
-    <meta name="robots" content="noindex, nofollow"/>
+    {!indexable && <meta name="robots" content="noindex, nofollow"/>}
     <meta name="theme-color" content="#121214"/>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-    <link rel="alternate" hreflang="en" href={pathFor('en', page, slug)}/>
-    <link rel="alternate" hreflang="es" href={pathFor('es', page, slug)}/>
+    {!noindex && <>
+      <link rel="canonical" href={pageUrl(locale)}/>
+      <link rel="alternate" hreflang="en" href={pageUrl('en')}/>
+      <link rel="alternate" hreflang="es" href={pageUrl('es')}/>
+      <link rel="alternate" hreflang="x-default" href={pageUrl('en')}/>
+    </>}
   </head>
   <body data-locale={locale} class:list={{ 'age-locked': !isPolicyPage }}>
     {!isPolicyPage && <AgeGate locale={locale} page={page} slug={slug}/>}

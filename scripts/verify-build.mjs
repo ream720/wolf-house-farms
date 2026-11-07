@@ -3,7 +3,21 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import { POLICY_VERSION } from '../src/data/policies.ts';
 import { getStrain, getAvailableOffer } from '../src/data/catalog.ts';
+import { allRoutes, pathFor, isIndexablePage } from '../src/lib/routes.ts';
+import { SITE_URL } from '../src/data/site.ts';
 const root = path.resolve("dist/client");
+const routes = allRoutes();
+const sitemap = await readFile(path.join(root, 'sitemap.xml'), 'utf8');
+const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+const expectedUrls = routes.filter(route => isIndexablePage(route.page)).map(route => new URL(route.path, SITE_URL).href);
+assert.deepEqual([...sitemapUrls].sort(), [...expectedUrls].sort(), 'Sitemap must contain exactly the indexable routes');
+assert.equal(new Set(sitemapUrls).size, sitemapUrls.length, 'Sitemap URLs must be unique');
+assert.match(sitemap, /xmlns:xhtml="http:\/\/www.w3.org\/1999\/xhtml"/);
+const robots = await readFile(path.join(root, 'robots.txt'), 'utf8');
+assert.doesNotMatch(robots, /^Disallow:\s*\/\s*$/m, 'Public crawling must be enabled');
+assert.match(robots, /^Disallow: \/admin\/$/m);
+assert.match(robots, /^Disallow: \/api\/$/m);
+assert.ok(robots.includes(`Sitemap: ${SITE_URL}/sitemap.xml`));
 async function walk(dir) {
   const files = await readdir(dir, { withFileTypes: true });
   const nested = await Promise.all(
@@ -31,7 +45,27 @@ for (const file of pages) {
     continue;
   }
   assert.match(html, /<html lang="(?:en|es)"/);
-  assert.match(html, /noindex, nofollow/);
+  const routePath = relative === 'index.html' ? '/' : `/${relative.replace(/index\.html$/, '')}`;
+  const route = routes.find(item => item.path === routePath);
+  if (relative === '404.html' || (route && !isIndexablePage(route.page))) {
+    assert.match(html, /<meta name="robots" content="noindex, nofollow"/);
+  } else {
+    assert.ok(route, `${relative}: unknown public route`);
+    assert.doesNotMatch(html, /noindex|nofollow/);
+  }
+  if (route) {
+    assert.ok(html.includes(`<link rel="canonical" href="${new URL(route.path, SITE_URL).href}"`), `${relative}: incorrect canonical URL`);
+    for (const language of ['en', 'es', 'x-default']) {
+      const alternate = new URL(pathFor(language === 'es' ? 'es' : 'en', route.page, route.slug), SITE_URL).href;
+      assert.ok(html.includes(`<link rel="alternate" hreflang="${language}" href="${alternate}"`), `${relative}: missing absolute language URL`);
+      if (isIndexablePage(route.page)) {
+        const entry = sitemap.match(new RegExp(`<url>\\s*<loc>${new URL(route.path, SITE_URL).href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}</loc>([\\s\\S]*?)</url>`))?.[1];
+        assert.ok(entry?.includes(`hreflang="${language}" href="${alternate}"`), `${relative}: missing sitemap language alternate`);
+      }
+    }
+  } else {
+    assert.doesNotMatch(html, /rel="canonical"/, '404 must not canonicalize to the homepage');
+  }
   const isPolicy = /^(?:terms|privacy|ordering|faq|es\/(?:terminos|privacidad|pedidos|preguntas-frecuentes))\/index\.html$/.test(relative);
   if (isPolicy) {
     assert.doesNotMatch(html, /class="age-gate"|data-site-content inert/);
@@ -71,6 +105,8 @@ for (const file of pages) {
     const methods = [...html.matchAll(/<option value="(cashapp|apple_pay|cash|paypal|zelle)"/g)].map(match=>match[1]);
     assert.deepEqual(methods,['cashapp','apple_pay','cash']);
     assert.ok(html.includes('$Wolfhousegenetics'));
+    assert.ok(html.includes('Apple Pay · 209-404-9891'));
+    assert.doesNotMatch(html, /Apple Pay phone number to be confirmed|Número de Apple Pay por confirmar/);
     assert.match(html,/data-payment-account-field/);
     assert.match(html,/data-payment-destination="cash"/);
     assert.ok(html.includes('1700 McHenry Ave Ste 65B PMB166'));
@@ -97,5 +133,5 @@ for (const target of ['/genetics/','/es/genetica/']) {
   assert.ok(deployment.routes.some(route => route.headers?.Location === target), `Missing legacy redirect to ${target}`);
 }
 console.log(
-  `Verified ${pages.length} HTML pages and ${references} local page/asset references.`,
+  `Verified ${pages.length} HTML pages, ${sitemapUrls.length} sitemap URLs, indexing rules, language alternates and ${references} local page/asset references.`,
 );

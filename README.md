@@ -26,7 +26,7 @@ npm run verify:build
 npm run audit:security
 ```
 
-Build verification checks 67 public HTML pages, local links and assets, upcoming-variety restrictions, and legacy redirects in the Vercel routing configuration. Live backend verification scripts are for isolated development environments only; they create temporary order and authentication fixtures.
+Build verification checks 67 public HTML pages, canonical and language URLs, sitemap coverage, crawler rules, local links and assets, upcoming-variety restrictions, and legacy redirects in the Vercel routing configuration. Live backend verification scripts are for isolated development environments only; they create temporary order and authentication fixtures.
 
 The application uses Astro 7 and its Vercel adapter. Scoped dependency overrides keep the adapter's `glob` and `path-to-regexp` dependencies on patched releases until upstream updates those ranges. The security audit uses the official npm registry because some registry mirrors do not support the audit API. Commit `package-lock.json` with dependency changes and rerun these checks before deployment.
 
@@ -44,7 +44,9 @@ Configure these variables in the intended Vercel environment:
 | `ORDER_RATE_LIMIT_SECRET` | Stable random secret of at least 32 characters, unique per environment |
 | `ORDERS_ENABLED` | Start with `false`; enable submissions after deployment testing |
 
-Do not prefix privileged keys with `PUBLIC_`. Use a separate backend for independent test orders. Verify administrator login over HTTPS before enabling orders. Keep the existing noindex metadata and robots rules during client review; these control indexing and do not restrict site access.
+Do not prefix privileged keys with `PUBLIC_`. Use a separate backend for independent test orders. Verify administrator login over HTTPS before enabling orders.
+
+The production domain is `https://wolfhousegenetics.com`; `www` redirects to it in Vercel. `src/data/site.ts` supplies the canonical origin. Public content is open to indexing, with absolute English/Spanish alternate URLs and a generated `/sitemap.xml` advertised in `/robots.txt`. Checkout, confirmation, 404, admin and API responses remain excluded from indexing. Admin authentication continues to enforce access separately from crawler rules.
 
 A new backend requires the schema and administrator membership to be configured separately. Do not reapply `supabase/schema.sql` to an already configured backend.
 
@@ -58,9 +60,9 @@ A new backend requires the schema and administrator membership to be configured 
 
 Payment collection and customer communication are manual. The site does not process payments or automatically send invoices or customer emails. Availability is configured in source; finite inventory allocation and stock management are not implemented.
 
-Checkout offers Cash App, Apple Pay, and cash by mail. The Cash App destination is `$Wolfhousegenetics`; the Apple Pay phone is awaiting client confirmation. Mailed cash uses Wolf House Farms, 1700 McHenry Ave Ste 65B PMB166, Modesto, CA 95350. The app collects the customer's payment contact for digital methods; cash requires no payment-app account. Earlier PayPal and Zelle orders retain their original method and can still be managed.
+Checkout offers Cash App, Apple Pay, and cash by mail. The Cash App destination is `$Wolfhousegenetics`; the Apple Pay phone is `209-404-9891`. Mailed cash uses Wolf House Farms, 1700 McHenry Ave Ste 65B PMB166, Modesto, CA 95350. The app collects the customer's payment contact for digital methods; cash requires no payment-app account. Earlier PayPal and Zelle orders retain their original method and can still be managed.
 
-The existing WHF database has the `allow_cash_by_mail_payment` migration applied. For another existing database, apply `supabase/enable-cash-by-mail.sql` before enabling cash (do not reapply the bootstrap schema). Public payment destinations are maintained in `src/data/payments.ts`; add the confirmed Apple Pay phone there when supplied. If the mailing address is cleared or incomplete, new cash reservations are blocked automatically.
+The existing WHF database has the `allow_cash_by_mail_payment` migration applied. For another existing database, apply `supabase/enable-cash-by-mail.sql` before enabling cash (do not reapply the bootstrap schema). Public payment destinations are maintained in `src/data/payments.ts`. If the mailing address is cleared or incomplete, new cash reservations are blocked automatically.
 
 ## Content and assets
 
