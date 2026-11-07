@@ -17,7 +17,7 @@ test('cash confirmation asks for prompt mailing with an order number and shows t
 test('digital confirmations wait for the selected app request and do not show a mailing address',()=>{
   for(const method of ['cashapp','apple_pay'] as const) {
     const en=confirmationInstructions(method,'en');
-    assert.match(en.body,/Wait for Wolf House Farms/);
+    assert.match(en.body,/Wait for Wolf House Genetics/);
     assert.ok(en.body.includes(method==='cashapp'?'Cash App':'Apple Pay'));
     assert.equal(en.showMailingAddress,false);
     const es=confirmationInstructions(method,'es');

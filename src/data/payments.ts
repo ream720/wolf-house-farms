@@ -12,7 +12,7 @@ export const paymentDestinations = {
   cashAppCashtag: '$Wolfhousegenetics',
   applePayPhone: '209-404-9891',
   cashMailAddress: {
-    recipient: 'Wolf House Farms',
+    recipient: 'Wolf House Genetics',
     poBox: '1700 McHenry Ave Ste 65B PMB166',
     city: 'Modesto',
     state: 'CA',

@@ -7,7 +7,7 @@ const { locale, kind } = Astro.props; const p = policyUI[locale]; const t = ui(l
 const sections = kind === 'terms' ? termsSections[locale] : kind === 'ordering' ? shippingSections[locale] : kind === 'faq' ? faqSections[locale] : [];
 ---
 <article class="wrap policy-page" data-policy-version={POLICY_VERSION}>
-  <header><p class="eyebrow">Wolf House Farms · 21+</p><h1>{p[kind]}</h1><p class="policy-updated">{p.updated}</p></header>
+  <header><p class="eyebrow">Wolf House Genetics · 21+</p><h1>{p[kind]}</h1><p class="policy-updated">{p.updated}</p></header>
   <nav class="policy-nav" aria-label={locale === 'en' ? 'Policies' : 'Políticas'}>{policyPages.map(page => <a href={pathFor(locale, page)} aria-current={kind === page ? 'page' : undefined}>{p[page]}</a>)}</nav>
   {kind === 'terms' && <p class="policy-intro">{p.souvenir}</p>}
   {sections.map(section => <section class="policy-section"><h2>{section.title}</h2><p>{section.body}</p></section>)}

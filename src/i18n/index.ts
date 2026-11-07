@@ -4,14 +4,14 @@ export const text = (en: string, es: string): Localized => ({ en, es });
 
 const en = {
   paymentDetails: 'Payment preference',
-  paymentIntro: 'Choose Cash App, Apple Pay, or cash by mail. Wolf House Farms confirms payment instructions manually. No payment is taken at checkout.',
+  paymentIntro: 'Choose Cash App, Apple Pay, or cash by mail. Wolf House Genetics confirms payment instructions manually. No payment is taken at checkout.',
   paymentMethod: 'Payment method', choosePayment: 'Choose a payment method',
   paymentAccount: 'Payment username or contact',
   paymentAccountHelp: 'Enter the account where you can receive the request. Never enter a password, card number, or bank details.',
-  cashappAccount: 'Cash App $Cashtag', cashappHelp: 'Enter your $Cashtag so Wolf House Farms can find your Cash App account.',
+  cashappAccount: 'Cash App $Cashtag', cashappHelp: 'Enter your $Cashtag so Wolf House Genetics can find your Cash App account.',
   contactAccount: 'Registered email or phone number',
   applePayHelp: 'Enter the email or phone number used for Apple Cash in Messages. The team will coordinate the request with you.',
-  paymentDestination: 'Wolf House Farms payment details',
+  paymentDestination: 'Wolf House Genetics payment details',
   paymentWait: 'Wait for WHF to confirm your order and payment instructions before sending funds.',
   applePayPending: 'Apple Pay phone number to be confirmed',
   cashMailPendingAddress: 'Mailing address to be confirmed',
@@ -176,9 +176,9 @@ const en = {
     "No confirmation email will be sent. Take a screenshot, save, or print this page to keep your confirmation details.",
   nextSteps: "Wait for your payment request",
   nextStepsBody:
-    "Wait for Wolf House Farms to send your payment request before sending payment. Keep your order # for any questions about your order.",
-  cashAppNextStepsBody: "Wait for Wolf House Farms to send a payment request to your Cash App account before sending payment.",
-  applePayNextStepsBody: "Wait for Wolf House Farms to contact you with an Apple Pay payment request before sending payment.",
+    "Wait for Wolf House Genetics to send your payment request before sending payment. Keep your order # for any questions about your order.",
+  cashAppNextStepsBody: "Wait for Wolf House Genetics to send a payment request to your Cash App account before sending payment.",
+  applePayNextStepsBody: "Wait for Wolf House Genetics to contact you with an Apple Pay payment request before sending payment.",
   cashMailNextSteps: "Mail your payment",
   cashMailNextStepsBody: "Mail payment as soon as possible to the address below. Include order # with payment.",
   mailPaymentTo: "Mail payment to",
@@ -193,7 +193,7 @@ const en = {
   ordering: "Ordering & shipping",
   privacyTitle: "A little clarity.",
   privacyBody:
-    "Your age confirmation and unfinished checkout are stored in this tab’s session. Your bag and language preference are saved in this browser. Submitting a reservation shares your name, email, US delivery address, payment preference and payment account contact with Wolf House Farms to manage the order and coordinate payment. Orders and their change history are stored in Supabase and accessed by approved WHF administrators. The website uses Vercel hosting. Your confirmation, including payment contact, stays in this tab’s session until you clear it or the session ends. We do not collect payment passwords, card numbers or bank details, and no marketing or analytics services are configured. Contact Wolf House Farms with questions about your order or personal information.",
+    "Your age confirmation and unfinished checkout are stored in this tab’s session. Your bag and language preference are saved in this browser. Submitting a reservation shares your name, email, US delivery address, payment preference and payment account contact with Wolf House Genetics to manage the order and coordinate payment. Orders and their change history are stored in Supabase and accessed by approved WHF administrators. The website uses Vercel hosting. Your confirmation, including payment contact, stays in this tab’s session until you clear it or the session ends. We do not collect payment passwords, card numbers or bank details, and no marketing or analytics services are configured. Contact Wolf House Genetics with questions about your order or personal information.",
   orderingTitle: "Reservations & shipping.",
   orderingBody:
     "Available catalog varieties can be reserved at $60 USD per 10-seed pack, with a limit of two packs per variety per order. Collections marked Coming soon are not open for reservations. Standard US shipping is $10 per order; expedited US shipping is $30 per order. Plantz pollen is $200 USD per 2 mL unit, with four units in the limited release. Add your selections to the bag and provide your contact and delivery details. WHF accepts Cash App, Apple Pay, and cash by mail only. For payment apps, include your registered username, email, or phone. Apple Pay coordination uses Apple Cash in Messages. Cash by mail is available using the mailing address shown at checkout; no payment-app account is needed for cash. No payment is taken at checkout. For Cash App or Apple Pay, wait for WHF’s payment request. For cash by mail, send payment as soon as possible and include your order #. Payment is verified before fulfillment. Save the on-screen confirmation and reference; automatic confirmation emails are not sent. Limited pollen stock is held when the reservation is saved and released if the order is cancelled. Seed availability remains subject to WHF’s confirmation. Contact WHF before paying if you need to change or cancel a reservation.",
@@ -230,14 +230,14 @@ const en = {
 };
 const es: typeof en = {
   paymentDetails: 'Preferencia de pago',
-  paymentIntro: 'Elige Cash App, Apple Pay o efectivo por correo. Wolf House Farms confirma las instrucciones de pago manualmente. No se cobra al enviar la reserva.',
+  paymentIntro: 'Elige Cash App, Apple Pay o efectivo por correo. Wolf House Genetics confirma las instrucciones de pago manualmente. No se cobra al enviar la reserva.',
   paymentMethod: 'Método de pago', choosePayment: 'Elige un método de pago',
   paymentAccount: 'Usuario o contacto de pago',
   paymentAccountHelp: 'Indica la cuenta donde puedes recibir la solicitud. Nunca introduzcas contraseñas, números de tarjeta ni datos bancarios.',
-  cashappAccount: '$Cashtag de Cash App', cashappHelp: 'Introduce tu $Cashtag para que Wolf House Farms encuentre tu cuenta de Cash App.',
+  cashappAccount: '$Cashtag de Cash App', cashappHelp: 'Introduce tu $Cashtag para que Wolf House Genetics encuentre tu cuenta de Cash App.',
   contactAccount: 'Correo o teléfono registrado',
   applePayHelp: 'Introduce el correo o teléfono que usas para Apple Cash en Mensajes. El equipo coordinará contigo la solicitud.',
-  paymentDestination: 'Datos de pago de Wolf House Farms',
+  paymentDestination: 'Datos de pago de Wolf House Genetics',
   paymentWait: 'Espera a que WHF confirme tu pedido y las instrucciones antes de enviar dinero.',
   applePayPending: 'Número de Apple Pay por confirmar',
   cashMailPendingAddress: 'Dirección del apartado postal por confirmar',
@@ -405,9 +405,9 @@ const es: typeof en = {
     "No se enviará un correo de confirmación. Haz una captura de pantalla, guarda o imprime esta página para conservar los detalles de tu confirmación.",
   nextSteps: "Espera tu solicitud de pago",
   nextStepsBody:
-    "Espera a que Wolf House Farms envíe tu solicitud de pago antes de pagar. Conserva tu número de pedido para cualquier consulta.",
-  cashAppNextStepsBody: "Espera a que Wolf House Farms envíe una solicitud de pago a tu cuenta de Cash App antes de pagar.",
-  applePayNextStepsBody: "Espera a que Wolf House Farms te contacte con una solicitud de pago de Apple Pay antes de pagar.",
+    "Espera a que Wolf House Genetics envíe tu solicitud de pago antes de pagar. Conserva tu número de pedido para cualquier consulta.",
+  cashAppNextStepsBody: "Espera a que Wolf House Genetics envíe una solicitud de pago a tu cuenta de Cash App antes de pagar.",
+  applePayNextStepsBody: "Espera a que Wolf House Genetics te contacte con una solicitud de pago de Apple Pay antes de pagar.",
   cashMailNextSteps: "Envía tu pago por correo",
   cashMailNextStepsBody: "Envía el pago lo antes posible a la dirección que aparece abajo. Incluye el número de pedido con el pago.",
   mailPaymentTo: "Envía el pago a",
@@ -423,7 +423,7 @@ const es: typeof en = {
   ordering: "Pedidos y envíos",
   privacyTitle: "Un poco de claridad.",
   privacyBody:
-    "Tu confirmación de edad y el formulario pendiente se guardan en la sesión de esta pestaña. Tu bolsa y preferencia de idioma se guardan en este navegador. Al enviar una reserva compartes tu nombre, correo, dirección de entrega en EE. UU., método de pago y contacto de la cuenta con Wolf House Farms para gestionar el pedido y coordinar el pago. Los pedidos y su historial se guardan en Supabase y solo los administradores autorizados de WHF pueden acceder a ellos. El sitio utiliza alojamiento de Vercel. Tu confirmación, incluido el contacto de pago, permanece en la sesión de esta pestaña hasta que la borres o termine la sesión. No recopilamos contraseñas de pago, números de tarjeta ni datos bancarios, y no hay servicios de marketing ni analítica configurados. Contacta a Wolf House Farms si tienes preguntas sobre tu pedido o tus datos personales.",
+    "Tu confirmación de edad y el formulario pendiente se guardan en la sesión de esta pestaña. Tu bolsa y preferencia de idioma se guardan en este navegador. Al enviar una reserva compartes tu nombre, correo, dirección de entrega en EE. UU., método de pago y contacto de la cuenta con Wolf House Genetics para gestionar el pedido y coordinar el pago. Los pedidos y su historial se guardan en Supabase y solo los administradores autorizados de WHF pueden acceder a ellos. El sitio utiliza alojamiento de Vercel. Tu confirmación, incluido el contacto de pago, permanece en la sesión de esta pestaña hasta que la borres o termine la sesión. No recopilamos contraseñas de pago, números de tarjeta ni datos bancarios, y no hay servicios de marketing ni analítica configurados. Contacta a Wolf House Genetics si tienes preguntas sobre tu pedido o tus datos personales.",
   orderingTitle: "Reservas y envíos.",
   orderingBody:
     "Las variedades disponibles del catálogo se pueden reservar a $60 USD por paquete de 10 semillas, con un límite de dos paquetes por variedad en cada pedido. Las colecciones marcadas Próximamente aún no aceptan reservas. El envío estándar en EE. UU. cuesta $10 por pedido; el envío exprés cuesta $30 por pedido. El polen de Plantz cuesta $200 USD por unidad de 2 mL, con cuatro unidades en esta edición limitada. Añade tus selecciones a la bolsa e introduce tus datos de contacto y entrega. WHF solo acepta Cash App, Apple Pay y efectivo por correo. Para las aplicaciones, incluye tu usuario, correo o teléfono registrado. Apple Pay se coordina mediante Apple Cash en Mensajes. El efectivo por correo está disponible mediante la dirección postal indicada al reservar; no requiere una cuenta de pago. No se cobra al enviar la reserva. Para Cash App o Apple Pay, espera la solicitud de pago de WHF. Si pagas en efectivo por correo, envía el pago lo antes posible e incluye tu número de pedido. El pago se verifica antes de preparar el envío. Guarda la confirmación y referencia en pantalla; no se envían correos automáticos de confirmación. Las existencias limitadas de polen se apartan al guardar la reserva y se liberan si se cancela el pedido. La disponibilidad de semillas queda sujeta a la confirmación de WHF. Contacta a WHF antes de pagar si necesitas cambiar o cancelar la reserva.",
