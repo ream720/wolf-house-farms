@@ -1000,7 +1000,7 @@ select:focus {
   align-items: center;
   gap: 20px 32px;
   justify-content: space-between;
-  border-block: 1px solid var(--line);
+  border-top: 1px solid var(--line);
   padding-block: 24px;
 }
 .pollen-offer > div:first-child { flex: 1 1 240px; }
