@@ -52,7 +52,7 @@ test('cash cannot be submitted until a complete mailing destination is configure
   try {
     paymentDestinations.cashMailAddress=null;
     const raw={...input,payment:{method:'cash',account:'stale-account'},terms:true,policyVersion:POLICY_VERSION};
-    assert.throws(()=>buildPublicOrderDetails(raw),/P.O. Box/);
+    assert.throws(()=>buildPublicOrderDetails(raw),/mailing address/);
     paymentDestinations.cashMailAddress=address;
     assert.deepEqual(buildPublicOrderDetails(raw).payment,{method:'cash',account:''});
   } finally {paymentDestinations.cashMailAddress=saved;}

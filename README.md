@@ -58,9 +58,9 @@ A new backend requires the schema and administrator membership to be configured 
 
 Payment collection and customer communication are manual. The site does not process payments or automatically send invoices or customer emails. Availability is configured in source; finite inventory allocation and stock management are not implemented.
 
-Checkout offers Cash App, Apple Pay, and a cash-by-mail preview. The Cash App destination is `$Wolfhousegenetics`; the Apple Pay phone and P.O. Box address are awaiting client confirmation. The app collects the customer's payment contact for digital methods and blocks new cash reservations while the mailing address is incomplete. Earlier PayPal and Zelle orders retain their original method and can still be managed.
+Checkout offers Cash App, Apple Pay, and cash by mail. The Cash App destination is `$Wolfhousegenetics`; the Apple Pay phone is awaiting client confirmation. Mailed cash uses Wolf House Farms, 1700 McHenry Ave Ste 65B PMB166, Modesto, CA 95350. The app collects the customer's payment contact for digital methods; cash requires no payment-app account. Earlier PayPal and Zelle orders retain their original method and can still be managed.
 
-To activate cash by mail, first apply `supabase/enable-cash-by-mail.sql` to the existing WHF database (do not reapply the bootstrap schema). Then fill in `cashMailAddress` in `src/data/payments.ts` and redeploy. Add the confirmed Apple Pay phone in that file when supplied. Verify a disposable cash order before opening that method to customers.
+The existing WHF database has the `allow_cash_by_mail_payment` migration applied. For another existing database, apply `supabase/enable-cash-by-mail.sql` before enabling cash (do not reapply the bootstrap schema). Public payment destinations are maintained in `src/data/payments.ts`; add the confirmed Apple Pay phone there when supplied. If the mailing address is cleared or incomplete, new cash reservations are blocked automatically.
 
 ## Content and assets
 

@@ -73,6 +73,9 @@ for (const file of pages) {
     assert.ok(html.includes('$Wolfhousegenetics'));
     assert.match(html,/data-payment-account-field/);
     assert.match(html,/data-payment-destination="cash"/);
+    assert.ok(html.includes('1700 McHenry Ave Ste 65B PMB166'));
+    assert.ok(html.includes('Modesto, CA 95350'));
+    assert.doesNotMatch(html,/<p class="payment-preview-notice">/);
     assert.doesNotMatch(copy,/PayPal|Zelle/);
   }
   for (const match of html.matchAll(

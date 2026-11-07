@@ -11,7 +11,13 @@ export interface CashMailAddress {
 export const paymentDestinations = {
   cashAppCashtag: '$Wolfhousegenetics',
   applePayPhone: '',
-  cashMailAddress: null as CashMailAddress | null,
+  cashMailAddress: {
+    recipient: 'Wolf House Farms',
+    poBox: '1700 McHenry Ave Ste 65B PMB166',
+    city: 'Modesto',
+    state: 'CA',
+    zip: '95350',
+  } as CashMailAddress | null,
 };
 
 export function isCashByMailReady(address = paymentDestinations.cashMailAddress) {

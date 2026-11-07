@@ -7,7 +7,8 @@ import { POLICY_VERSION } from '../src/data/policies.ts';
 const origin = process.env.WHF_TEST_ORIGIN || 'http://127.0.0.1:4322';
 const db = createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SECRET_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 const requestId=randomUUID(); const password=randomBytes(30).toString('hex');
-const email=`whf-check-${randomUUID()}@example.invalid`; let userId; let orderId;
+const cashRequestId=randomUUID();
+const email=`whf-check-${randomUUID()}@example.invalid`; let userId; let orderId; let cashOrderId;
 const customer={name:'WHF disposable verification',email,address:'123 Test Street',city:'Fresno',state:'CA',zip:'93701'};
 const payload={requestId,customer,payment:{method:'cashapp',account:'$WHFTest'},cart:[{id:'demo-sandia',quantity:1}],terms:true,policyVersion:POLICY_VERSION,locale:'en'};
 const send = (path,body,cookie='',method='POST') => fetch(`${origin}${path}`,{method,redirect:'manual',headers:{Origin:origin,'Content-Type':'application/json',...(cookie?{Cookie:cookie}:{})},body:JSON.stringify(body)});
@@ -17,13 +18,19 @@ try {
   assert.equal((await send('/api/admin/orders/00000000-0000-4000-8000-000000000000/',{},'','PATCH')).status,401);
   assert.equal((await fetch(`${origin}/api/orders/`,{method:'POST',headers:{Origin:'https://other.example','Content-Type':'application/json'},body:'{}'})).status,403);
   const invalid=await send('/api/orders/',{...payload,payment:{method:'cashapp',account:''}}); assert.equal(invalid.status,400);
-  for (const payment of [{method:'paypal',account:email},{method:'zelle',account:email},{method:'cash',account:''}]) {
+  for (const payment of [{method:'paypal',account:email},{method:'zelle',account:email}]) {
     assert.equal((await send('/api/orders/',{...payload,payment})).status,400);
   }
   const submissions=await Promise.all([send('/api/orders/',payload),send('/api/orders/',payload)]);
   const receipts=await Promise.all(submissions.map(async r=>{const body=await r.json();assert.equal(r.status,201,JSON.stringify(body));return body.confirmation;}));
   assert.deepEqual(receipts[0],receipts[1]); assert.equal(receipts[0].total,7000);
   const saved=await db.from('whf_orders').select('id,version,items,customer,payment,shipping',{count:'exact'}).eq('request_id',requestId); assert.ifError(saved.error); assert.equal(saved.count,1); orderId=saved.data[0].id;
+  const cashPayload={...payload,requestId:cashRequestId,payment:{method:'cash',account:''}};
+  const cashResponses=await Promise.all([send('/api/orders/',cashPayload),send('/api/orders/',cashPayload)]);
+  const cashReceipts=await Promise.all(cashResponses.map(async response=>{const body=await response.json();assert.equal(response.status,201,JSON.stringify(body));return body.confirmation;}));
+  assert.deepEqual(cashReceipts[0],cashReceipts[1]);assert.deepEqual(cashReceipts[0].payment,cashPayload.payment);
+  const cashSaved=await db.from('whf_orders').select('id,payment,payment_status',{count:'exact'}).eq('request_id',cashRequestId);assert.ifError(cashSaved.error);assert.equal(cashSaved.count,1);cashOrderId=cashSaved.data[0].id;
+  assert.deepEqual(cashSaved.data[0].payment,cashPayload.payment);assert.equal(cashSaved.data[0].payment_status,'pending');
   const created=await db.auth.admin.createUser({email,password,email_confirm:true}); assert.ifError(created.error); userId=created.data.user.id;
   const denied=await login(); assert.equal(denied.status,200); assert.match(await denied.text(),/does not have WHF admin access/);
   assert.ifError((await db.from('whf_admins').insert({user_id:userId})).error);
@@ -31,6 +38,11 @@ try {
   assert.ok(signedIn.headers.getSetCookie().every(v=>/HttpOnly/i.test(v)));
   const list=await fetch(`${origin}/admin/orders/`,{headers:{Cookie:cookie}}); assert.equal(list.status,200); assert.match(await list.text(),/WHF disposable verification/);
   const detail=await fetch(`${origin}/admin/orders/${orderId}/`,{headers:{Cookie:cookie}}); assert.equal(detail.status,200); assert.match(await detail.text(),/Payment request/);
+  const cashDetail=await fetch(`${origin}/admin/orders/${cashOrderId}/`,{headers:{Cookie:cookie}});assert.equal(cashDetail.status,200);
+  const cashHTML=await cashDetail.text();assert.match(cashHTML,/value="cash" selected/);assert.match(cashHTML,/data-admin-payment-account-field hidden/);
+  const cashEdit={version:1,customer,payment:cashPayload.payment,cart:payload.cart,payment_status:'requested',fulfillment_status:'unfulfilled',tracking:'',carrier:'',notes:'Disposable cash verification'};
+  assert.equal((await send(`/api/admin/orders/${cashOrderId}/`,cashEdit,cookie,'PATCH')).status,200);
+  assert.equal((await send(`/api/admin/orders/${cashOrderId}/`,{...cashEdit,version:2,fulfillment_status:'packing'},cookie,'PATCH')).status,400);
   const edit={version:1,customer,payment:payload.payment,cart:payload.cart,payment_status:'paid',fulfillment_status:'packing',tracking:'',carrier:'',notes:'Disposable test note'};
   const updated=await send(`/api/admin/orders/${orderId}/`,edit,cookie,'PATCH'); const updateBody=await updated.json(); assert.equal(updated.status,200,JSON.stringify(updateBody)); assert.equal(updateBody.order.version,2);
   assert.equal((await send(`/api/admin/orders/${orderId}/`,edit,cookie,'PATCH')).status,409);
@@ -52,8 +64,10 @@ try {
   assert.ok((await publicClient.from('whf_orders').select('*')).error);
   assert.ifError((await db.from('whf_admins').delete().eq('user_id',userId)).error);
   assert.equal((await fetch(`${origin}/admin/orders/`,{headers:{Cookie:cookie}})).status,403);
-  console.log('Live checks passed: checkout, payment restrictions, retained legacy payments, concurrent retry, admin login, authorization, edits, conflicts, history, and public data isolation.');
+  console.log('Live checks passed: cash checkout and retries, no cash app-account requirement, cash admin edits, payment-before-fulfillment, digital checkout, retained legacy payments, authorization, and history.');
 } finally {
+  if (!cashOrderId) {const lookup=await db.from('whf_orders').select('id').eq('request_id',cashRequestId).maybeSingle();cashOrderId=lookup.data?.id;}
+  if(cashOrderId){assert.ifError((await db.from('whf_order_events').delete().eq('order_id',cashOrderId)).error);assert.ifError((await db.from('whf_orders').delete().eq('id',cashOrderId)).error);}
   if (!orderId) { const lookup=await db.from('whf_orders').select('id').eq('request_id',requestId).maybeSingle();orderId=lookup.data?.id; }
   if(orderId){assert.ifError((await db.from('whf_order_events').delete().eq('order_id',orderId)).error);assert.ifError((await db.from('whf_orders').delete().eq('id',orderId)).error);}
   if(userId){assert.ifError((await db.from('whf_admins').delete().eq('user_id',userId)).error);assert.ifError((await db.auth.admin.deleteUser(userId)).error);}
