@@ -1,4 +1,4 @@
-# Wolf House Farms
+# Wolf House Genetics
 
 A bilingual English/Spanish seed catalog built with Astro and TypeScript, with server-side order handling and an authenticated administration portal. Public catalog pages are prerendered; order APIs and administration run as Vercel functions.
 
@@ -53,7 +53,7 @@ A new backend requires the schema and administrator membership to be configured 
 ## Current behavior
 
 - English and Spanish catalogs, variety pages, search and collection filters.
-- Winter is coming leads the catalog with five Caviar crosses marked Coming soon; the existing 18 varieties remain available.
+- Winter is coming leads the catalog with five Caviar crosses marked Coming soon; 16 varieties remain available; Bakerz Dozen x Plantz and Lemon Zoap x Plantz are out of stock.
 - Adult entry and policy acknowledgement, shared cart and server-validated checkout.
 - Durable order storage, retry protection and saved original order details.
 - Approved-user administration for order edits, fulfillment, tracking, packing slips and change history.
@@ -64,7 +64,7 @@ Checkout offers Cash App, Apple Pay, and cash by mail. The Cash App destination 
 
 The existing WHF database has the `allow_cash_by_mail_payment` migration applied. For another existing database, apply `supabase/enable-cash-by-mail.sql` before enabling cash (do not reapply the bootstrap schema). Public payment destinations are maintained in `src/data/payments.ts`. If the mailing address is cleared or incomplete, new cash reservations are blocked automatically.
 
-US shipping offers standard service at $10 or expedited service at $30 total per order. Checkout calculates the selected rate on the server and preserves it on receipts and existing admin orders. No delivery time is promised.
+US shipping offers standard service at $15 or expedited service at $30 total per order. Checkout calculates the selected rate on the server and preserves it on receipts and existing admin orders. No delivery time is promised.
 
 The existing WHF database has the `limited_pollen_inventory` migration applied. For another existing backend, apply `supabase/migrations/20261107031809_limited_pollen_inventory.sql` once. Do not reapply `supabase/schema.sql`. New backends use the updated bootstrap schema. The stock table is server-only; `/api/inventory/` exposes only the remaining pollen quantity. `supabase/verify-pollen.sql` verifies allocation, retries, edits, cancellation and sold-out rejection using fixtures that are rolled back.
 

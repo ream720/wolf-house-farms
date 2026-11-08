@@ -83,6 +83,7 @@ for (const file of pages) {
   );
   assert.ok(!html.includes("undefined"), `${file}: unresolved content`);
   const copy = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,'').replace(/<[^>]*>/g,' ');
+  assert.doesNotMatch(copy,/wolf\s*house\s*farms/i,`${file}: old business name remains`);
   assert.doesNotMatch(copy,/design preview|vista previa|placeholder|demo only|demostraci[oó]n|concept website|sitio conceptual|draft editorial|texto editorial provisional|details pending|not yet confirmed|on their way|llegar[aá]n pronto|Desert Selections|New Horizons/i,`${file}: unfinished public copy`);
   if (/\/(?:genetics|genetica)\/[^/]+\/index\.html$/.test(`/${relative}`)) {
     const strain=getStrain(relative.split('/').at(-2));
@@ -90,8 +91,8 @@ for (const file of pages) {
       assert.match(html,/data-add-offer=/,`${file}: available variety cannot be ordered`);
       assert.match(html,/(?:\$|USD\s*)60\.00/,`${file}: pack must cost $60`);
     } else {
-      assert.doesNotMatch(html,/data-add-offer=/,`${file}: upcoming variety must not be orderable`);
-      assert.match(html,/Coming soon|Próximamente/,`${file}: upcoming status is missing`);
+      assert.doesNotMatch(html,/data-add-offer=/,`${file}: unavailable variety must not be orderable`);
+      assert.match(html,strain.status === 'coming-soon' ? /Coming soon|Próximamente/ : /Out of stock|Agotado/,`${file}: availability status is missing`);
     }
   }
   if(['index.html','es/index.html','genetics/index.html','es/genetica/index.html'].includes(relative)) {
@@ -109,7 +110,8 @@ for (const file of pages) {
     assert.match(html,/select name="shippingMethod" required/);
     assert.match(html,/<option value="standard">/);
     assert.match(html,/<option value="expedited">/);
-    assert.match(copy,/30\.00/);
+    assert.match(html,/<option value="standard">[^<]*15\.00/);
+    assert.match(html,/<option value="expedited">[^<]*30\.00/);
     const methods = [...html.matchAll(/<option value="(cashapp|apple_pay|cash|paypal|zelle)"/g)].map(match=>match[1]);
     assert.deepEqual(methods,['cashapp','apple_pay','cash']);
     assert.ok(html.includes('$Wolfhousegenetics'));

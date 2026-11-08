@@ -1,6 +1,6 @@
 import { ui, type Locale } from '../i18n/index.ts';
 
-export const shippingMethods = { standard: 1000, expedited: 3000 } as const;
+export const shippingMethods = { standard: 1500, expedited: 3000 } as const;
 export type ShippingMethod = keyof typeof shippingMethods;
 export function isShippingMethod(value: unknown): value is ShippingMethod {
   return typeof value === 'string' && Object.hasOwn(shippingMethods, value);

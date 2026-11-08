@@ -10,7 +10,7 @@ const lineage = formatLineage(s);
 const t = ui(locale);
 ---
 <a class="strain-card catalog-entry" href={pathFor(locale,'strain',s.id)} data-strain-card data-collection={line.id} data-search={`${s.name} ${lineage} ${t[line.label]}`.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}>
-  {s.status === 'coming-soon' && <span class="release-badge">{t.comingSoon}</span>}
+  {s.status === 'coming-soon' ? <span class="release-badge">{t.comingSoon}</span> : !s.available && <span class="release-badge">{t.currentlyUnavailable}</span>}
   <div class="strain-title"><h3>{s.name}</h3><span class="entry-arrow" aria-hidden="true"><Icon/></span></div>
   {s.name !== lineage && <p class="strain-lineage">{lineage}</p>}
 </a>

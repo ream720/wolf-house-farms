@@ -27,12 +27,12 @@ export async function requireAdmin(context: Pick<APIContext, 'request' | 'cookie
   const db = database();
   const {data, error: lookupError} = await db.from('whf_admins').select('user_id').eq('user_id',user.id).maybeSingle();
   if (lookupError) throw new OrderError('Admin access could not be checked.',503);
-  if (!data) throw new OrderError('This account does not have WHF admin access.',403);
+  if (!data) throw new OrderError('This account does not have Wolf House Genetics admin access.',403);
   return { user, db };
 }
 export function sameOrigin(request: Request) {
   const origin = request.headers.get('origin');
-  if (!origin || origin !== new URL(request.url).origin) throw new OrderError('Please submit from the WHF website.',403);
+  if (!origin || origin !== new URL(request.url).origin) throw new OrderError('Please submit from the Wolf House Genetics website.',403);
 }
 export async function readJSON(request: Request): Promise<Record<string, unknown>> {
   if (!request.headers.get('content-type')?.includes('application/json')) throw new OrderError('JSON is required.',415);
@@ -50,7 +50,7 @@ export async function readJSON(request: Request): Promise<Record<string, unknown
 export function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), {status,headers:{'Content-Type':'application/json','Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}}); }
 export function failure(error: unknown) {
   if (error instanceof OrderError) return json({error:error.message},error.status);
-  console.error('WHF operation failed');
+  console.error('Wolf House Genetics operation failed');
   return json({error:'The order service is unavailable. Please try again.'},503);
 }
 export async function rateKey(context: APIContext) {

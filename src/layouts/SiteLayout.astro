@@ -26,7 +26,7 @@ const p = policyUI[locale];
 <html lang={locale}>
   <head>
     <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>{title === 'Wolf House Farms' ? title : `${title} — Wolf House Farms`}</title>
+    <title>{title === 'Wolf House Genetics' ? title : `${title} — Wolf House Genetics`}</title>
     <meta name="description" content={description || t.heroIntro}/>
     {!indexable && <meta name="robots" content="noindex, nofollow"/>}
     <meta name="theme-color" content="#121214"/>
@@ -43,8 +43,8 @@ const p = policyUI[locale];
     <div data-site-content inert={!isPolicyPage}>
     <a class="skip-link" href="#main">{t.skip}</a>
     <header class="site-header wrap">
-      <a class="wordmark" href={pathFor(locale,'home')} aria-label="Wolf House Farms">
-        <img class="wordmark-mascots" src="/images/wolf-xolo.webp" alt="" width="90" height="60"/><span>WOLF HOUSE<small>FARMS</small></span>
+      <a class="wordmark" href={pathFor(locale,'home')} aria-label="Wolf House Genetics">
+        <img class="wordmark-mascots" src="/images/wolf-xolo.webp" alt="" width="90" height="60"/><span>WOLF HOUSE<small>GENETICS</small></span>
       </a>
       <nav class="desktop-nav" aria-label={locale === 'en' ? 'Main navigation' : 'Navegación principal'}>
         {nav.map(item => <a href={pathFor(locale, item)} aria-current={current === item ? 'page' : undefined}>{t[item]}</a>)}
@@ -64,12 +64,12 @@ const p = policyUI[locale];
     <main id="main"><slot/></main>
     <footer class="site-footer">
       <div class="wrap footer-top">
-        <div><a class="wordmark footer-wordmark" href={pathFor(locale,'home')}><img class="wordmark-mascots" src="/images/wolf-xolo.webp" alt="" width="90" height="60"/><span>WOLF HOUSE<small>FARMS</small></span></a><p class="footer-tagline">{t.footerTagline}</p></div>
+        <div><a class="wordmark footer-wordmark" href={pathFor(locale,'home')}><img class="wordmark-mascots" src="/images/wolf-xolo.webp" alt="" width="90" height="60"/><span>WOLF HOUSE<small>GENETICS</small></span></a><p class="footer-tagline">{t.footerTagline}</p></div>
         <div class="footer-links"><span class="eyebrow">{t.footerNote}</span><div>{nav.map(item => <a href={pathFor(locale,item)}>{t[item]}</a>)}<a href={pathFor(locale,'contact')}>{t.contact}</a></div></div>
         <div class="footer-location"><Icon name="sun" size={46}/><p>{t.location}</p></div>
       </div>
       <div class="wrap footer-disclaimer"><p>{p.souvenir}</p></div>
-      <div class="wrap footer-bottom"><span>© {new Date().getFullYear()} Wolf House Farms</span><div>{policyPages.map(item => <a href={pathFor(locale, item)}>{p[item]}</a>)}</div></div>
+      <div class="wrap footer-bottom"><span>© {new Date().getFullYear()} Wolf House Genetics</span><div>{policyPages.map(item => <a href={pathFor(locale, item)}>{p[item]}</a>)}</div></div>
     </footer>
     </div>
     <div class="toast" role="status" aria-live="polite" hidden></div>

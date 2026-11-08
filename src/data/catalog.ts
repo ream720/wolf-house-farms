@@ -11,7 +11,7 @@ export interface Project {
   goal: Localized;
   approach: Localized;
 }
-// No project records are published until WHF supplies its project map.
+// No project records are published until Wolf House Genetics supplies its project map.
 export const projects: Project[] = [];
 
 export const catalogLines = [
@@ -27,7 +27,7 @@ export interface Strain {
   name: string;
   project?: string;
   status: "coming-soon" | "current" | "historical" | "retired";
-  /** Whether this variety accepts reservations. Finite stock is managed by WHF. */
+  /** Whether this variety accepts reservations. Finite stock is managed by Wolf House Genetics. */
   available: boolean;
   number: string;
   image?: string;
@@ -182,10 +182,10 @@ for (const [index, [id, parent, available]] of cherryBatch.entries()) {
   });
 }
 const plantzCrosses = [
-  ["bakerz-dozen-plantz", "Bakerz Dozen", "Bakerz Dozen x Plantz", true],
+  ["bakerz-dozen-plantz", "Bakerz Dozen", "Bakerz Dozen x Plantz", false],
   ["toronjaz-plantz", "Toronjaz", "Toronjaz x Plantz", true],
   ["gary-payton-zushi-plantz", "Gary Payton x Zushi", "(Gary Patyon x Zushi) x Plantz", true],
-  ["lemon-zoap-plantz", "Lemon Zoap", "Lemon Zoap x Plantz", true],
+  ["lemon-zoap-plantz", "Lemon Zoap", "Lemon Zoap x Plantz", false],
   ["maple-nectar-plantz", "Maple Nectar", "Maple Nectar x Plantz", true],
   ["plantz-plantz", "Plantz", "Plantz x Plantz", true],
 ] as const;
@@ -220,8 +220,8 @@ for (const [index, [id, suppliedLineage]] of caviarCrosses.entries()) {
     // The supplied list does not confirm parent sexes or seed type.
     imageAlt:text('',''), artStory:text('',''),
     description:text(
-      `${suppliedLineage} is part of Winter is coming, the upcoming Caviar line from Wolf House Farms.`,
-      `${suppliedLineage} forma parte de Winter is coming, la próxima línea Caviar de Wolf House Farms.`,
+      `${suppliedLineage} is part of Winter is coming, the upcoming Caviar line from Wolf House Genetics.`,
+      `${suppliedLineage} forma parte de Winter is coming, la próxima línea Caviar de Wolf House Genetics.`,
     ),
   });
 }
@@ -243,7 +243,7 @@ export const getProject = (id: string) => projects.find((p) => p.id === id)!;
 export const getStrain = (id: string) => strains.find((s) => s.id === id)!;
 export const PACK_PRICE_CENTS = 6000;
 export const MAX_PACKS_PER_VARIETY = 2;
-export const SHIPPING_CENTS = 1000;
+export const SHIPPING_CENTS = 1500;
 export const pollenOffer = {
   id: 'pollen-plantz-2ml', strain: 'plantz-pollen', name: text('Plantz pollen', 'Polen de Plantz'),
   pack: text('2 mL pollen per unit', '2 mL de polen por unidad'),

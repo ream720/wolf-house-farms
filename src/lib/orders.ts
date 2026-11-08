@@ -61,7 +61,7 @@ export function buildOrderDetails(raw: Record<string, unknown>, previous?: Order
   const customer = parseCustomer(raw.customer);
   const payment = parsePayment(raw.payment, previous?.payment.method);
   if (payment.method === 'cash' && previous?.payment.method !== 'cash' && !isCashByMailReady()) {
-    throw new OrderError('Cash by mail is unavailable until WHF confirms its complete mailing address. Choose Cash App or Apple Pay.');
+    throw new OrderError('Cash by mail is unavailable until Wolf House Genetics confirms its complete mailing address. Choose Cash App or Apple Pay.');
   }
   if (!Array.isArray(raw.cart) || !raw.cart.length || raw.cart.length > 30) throw new OrderError('Your bag is empty or invalid.');
   // Preserve the agreed price/pack for existing lines during admin edits, even if an offer is retired.

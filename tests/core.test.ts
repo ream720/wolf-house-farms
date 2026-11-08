@@ -53,7 +53,7 @@ test("USD totals use integer cents, trusted offer prices and no shipping on empt
       { id: "demo-sandia", quantity: 2 },
       { id: "demo-cherry", quantity: 1 },
     ]),
-    { subtotal: 18000, shipping: 1000, total: 19000 },
+    { subtotal: 18000, shipping: 1500, total: 19500 },
   );
 });
 test("checkout form requires complete contact, US address shape and acknowledgement", () => {
@@ -106,12 +106,12 @@ test("both interface languages are complete and catalog relationships are valid"
   }
   for (const o of seedOffers) assert.ok(strains.find((s) => s.id === o.strain));
 });
-test('the 18 available varieties keep their $60 packs and all SKUs remain unique',()=>{
+test('the 16 available varieties keep their $60 packs and all SKUs remain unique',()=>{
   assert.equal(seedOffers.length,23);
   assert.equal(new Set(offers.map(offer=>offer.id)).size,24);
   assert.ok(seedOffers.every(offer=>offer.cents===6000));
   const available = strains.filter(strain=>strain.available);
-  assert.equal(available.length,18);
+  assert.equal(available.length,16);
   for (const strain of available) {
     assert.equal(getAvailableOffer(strain.id)?.cents,6000);
     assert.equal(getAvailableOffer(strain.id)?.max,2);
@@ -232,7 +232,7 @@ test("availability switches per variety without removing its catalog routes", ()
     assert.ok(allRoutes().some(r => r.page === "strain" && r.slug === strain.id));
     // Prior order confirmations remain readable when availability changes later.
     assert.deepEqual(normalizeCart(selected, {allowUnavailable:true}), selected);
-    assert.equal(calculateTotals(selected, {allowUnavailable:true}).total, 7000);
+    assert.equal(calculateTotals(selected, {allowUnavailable:true}).total, 7500);
     strain.available = true;
     assert.equal(getAvailableOffer(strain.id)?.id, "demo-sandia");
     assert.deepEqual(normalizeCart(selected), selected);
@@ -249,9 +249,10 @@ test("Plantz remains an independent line with six bilingual variety routes", () 
   assert.equal(new Set(strains.map(s => s.id)).size, strains.length);
   for (const s of members) {
     assert.equal(s.father, "Plantz");
-    assert.equal(s.available, true);
+    const available = !['bakerz-dozen-plantz','lemon-zoap-plantz'].includes(s.id);
+    assert.equal(s.available, available);
     assert.equal(s.seedType, undefined);
-    assert.equal(getAvailableOffer(s.id)?.cents, 6000);
+    assert.equal(getAvailableOffer(s.id)?.cents, available ? 6000 : undefined);
     assert.equal(s.name, formatLineage(s));
     for (const locale of ["en", "es"] as const)
       assert.ok(allRoutes().some(r => r.path === pathFor(locale, "strain", s.id)));

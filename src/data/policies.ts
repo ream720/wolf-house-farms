@@ -1,12 +1,12 @@
 import type { Locale } from '../i18n/index.ts';
 
 // Bump whenever the policies or agreement change. Keep prior versions in source history.
-export const POLICY_VERSION = '2026-11-07.1';
+export const POLICY_VERSION = '2026-11-08.1';
 export const policyPages = ['terms', 'privacy', 'ordering', 'faq'] as const;
 export const policyUI = {
   en: {
     terms: 'Terms & Conditions', privacy: 'Privacy Policy', ordering: 'Shipping & Returns', faq: 'FAQ',
-    updated: 'Last updated: November 7, 2026', back: 'Return to age confirmation',
+    updated: 'Last updated: November 8, 2026', back: 'Return to age confirmation',
     ageAgreement: 'I certify that I am 21 years of age or older. I have read and agree to the',
     checkoutAgreement: 'I certify that I am 21 years of age or older, that I am legally allowed to purchase these cannabis seeds or pollen in my jurisdiction, and that I will not use these products in violation of any applicable laws. I have read and agree to the',
     and: 'and', agree: 'Agree & enter',
@@ -15,7 +15,7 @@ export const policyUI = {
   },
   es: {
     terms: 'Términos y condiciones', privacy: 'Política de privacidad', ordering: 'Envíos y devoluciones', faq: 'Preguntas frecuentes',
-    updated: 'Última actualización: 7 de noviembre de 2026', back: 'Volver a la confirmación de edad',
+    updated: 'Última actualización: 8 de noviembre de 2026', back: 'Volver a la confirmación de edad',
     ageAgreement: 'Certifico que tengo 21 años o más. He leído y acepto los',
     checkoutAgreement: 'Certifico que tengo 21 años o más, que puedo comprar estas semillas o este polen de cannabis legalmente en mi jurisdicción y que no utilizaré estos productos infringiendo ninguna ley aplicable. He leído y acepto los',
     and: 'y la', agree: 'Aceptar y entrar',
@@ -51,14 +51,14 @@ export const termsSections: Record<Locale, Section[]> = {
 export const shippingSections: Record<Locale, Section[]> = {
   en: [
     { title: 'US delivery only', body: 'Wolf House Genetics accepts orders for delivery within the United States to adults 21 years of age or older, only where the sale, shipment, and possession of the ordered seeds or pollen are lawful. We do not ship internationally. Orders with delivery addresses outside the United States will be canceled and refunded if payment has been collected. A US address alone does not establish that a shipment is lawful.' },
-    { title: 'Packaging & delivery', body: 'Orders are shipped in discreet, odor-proof packaging with no external indication of contents. Standard US shipping is $10 per order; expedited US shipping is $30 per order. Choose your service at checkout. We do not promise a dispatch or delivery date unless confirmed for your order.' },
+    { title: 'Packaging & delivery', body: 'Orders are shipped in discreet, odor-proof packaging with no external indication of contents. Standard US shipping is $15 per order; expedited US shipping is $30 per order. Choose your service at checkout. We do not promise a dispatch or delivery date unless confirmed for your order.' },
     { title: 'Local laws & forwarding', body: 'It is your responsibility to understand applicable laws before purchasing, germinating, or cultivating seeds. Wolf House Genetics does not promote or condone illegal cultivation. If you independently forward a delivery outside the US, you assume the risk of customs seizure. We do not offer reshipment for customs seizures. Forwarding does not change our US-only shipping policy.' },
     { title: 'Final sales & damaged deliveries', body: 'To maintain genetic integrity, seed sales are final once the product has shipped. We do not accept returns or exchanges unless the product arrives damaged, subject to rights required by applicable law. Report damage within 48 hours of delivery with photos and your order reference, using the contact channel supplied with your order or payment request. Keep the product and packaging while your claim is reviewed.' },
     { title: 'Payment & confirmation', body: 'No payment is taken at checkout. Wolf House Genetics coordinates Cash App and Apple Pay payments manually using your payment contact. Cash by mail needs no payment-app account. Use the mailing address shown at checkout. For Cash App or Apple Pay, wait for the team’s payment request. For cash by mail, send payment as soon as possible and include your order number. Payment is verified before fulfillment. Save or print your on-screen confirmation because automatic confirmation emails are not sent.' },
   ],
   es: [
     { title: 'Solo entregas en Estados Unidos', body: 'Wolf House Genetics acepta pedidos para entrega dentro de Estados Unidos a personas de 21 años o más, únicamente donde la venta, el envío y la posesión de las semillas o del polen del pedido sean legales. No realizamos envíos internacionales. Los pedidos con dirección de entrega fuera de EE. UU. se cancelarán y se reembolsarán si ya se ha cobrado el pago. Una dirección estadounidense no demuestra por sí sola que el envío sea legal.' },
-    { title: 'Embalaje y entrega', body: 'Los pedidos se envían en embalaje discreto, a prueba de olores y sin indicación externa del contenido. El envío estándar en EE. UU. cuesta $10 por pedido; el envío exprés cuesta $30 por pedido. Elige el servicio al finalizar la reserva. No prometemos fechas de expedición ni de entrega salvo confirmación para tu pedido.' },
+    { title: 'Embalaje y entrega', body: 'Los pedidos se envían en embalaje discreto, a prueba de olores y sin indicación externa del contenido. El envío estándar en EE. UU. cuesta $15 por pedido; el envío exprés cuesta $30 por pedido. Elige el servicio al finalizar la reserva. No prometemos fechas de expedición ni de entrega salvo confirmación para tu pedido.' },
     { title: 'Leyes locales y reenvío', body: 'Te corresponde conocer las leyes aplicables antes de comprar, germinar o cultivar semillas. Wolf House Genetics no fomenta ni aprueba el cultivo ilegal. Si reenvías por tu cuenta un paquete fuera de EE. UU., asumes el riesgo de incautación aduanera. No ofrecemos un nuevo envío en caso de incautación. El reenvío no modifica nuestra política de envíos solo dentro de EE. UU.' },
     { title: 'Ventas finales y productos dañados', body: 'Para mantener la integridad genética, las ventas de semillas son finales una vez enviado el producto. No aceptamos devoluciones ni cambios salvo que llegue dañado, sin perjuicio de los derechos exigidos por la ley. Comunica el daño dentro de las 48 horas siguientes a la entrega, con fotos y la referencia del pedido, mediante el canal de contacto facilitado con tu pedido o solicitud de pago. Conserva el producto y el embalaje mientras se revisa la reclamación.' },
     { title: 'Pago y confirmación', body: 'No se cobra al enviar la reserva. Wolf House Genetics coordina los pagos de Cash App y Apple Pay manualmente mediante tu contacto de pago. El efectivo por correo no requiere una cuenta de pago. Utiliza la dirección postal indicada al reservar. Para Cash App o Apple Pay, espera la solicitud de pago del equipo. Si pagas en efectivo por correo, envía el pago lo antes posible e incluye tu número de pedido. El pago se verifica antes de preparar el envío. Guarda o imprime la confirmación en pantalla porque no se envían correos automáticos de confirmación.' },

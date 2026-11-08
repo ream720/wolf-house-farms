@@ -64,7 +64,7 @@ test('server validates bounded US contact details',()=>{
 });
 test('order totals and item snapshots come from trusted catalog data',()=>{
   const details=buildOrderDetails({...input,subtotal:1,total:1,cart:[{id:'demo-sandia',quantity:2,unitCents:1,name:'forged'}]});
-  assert.equal(details.total,13000); assert.equal(details.items[0].name,'La Sandía'); assert.equal(details.items[0].unitCents,6000);
+  assert.equal(details.total,13500); assert.equal(details.items[0].name,'La Sandía'); assert.equal(details.items[0].unitCents,6000);
   for(const cart of [[],[{id:'unknown',quantity:1}],[{id:'demo-sandia',quantity:3}],[{id:'demo-sandia',quantity:1.5}],[{id:'demo-sandia',quantity:1},{id:'demo-sandia',quantity:1}],[{id:'demo-sandia',quantity:0}]]) assert.throws(()=>buildOrderDetails({...input,cart}));
 });
 test('unavailable items are rejected, while existing order lines retain agreed prices',()=>{
@@ -77,30 +77,46 @@ test('unavailable items are rejected, while existing order lines retain agreed p
     assert.throws(()=>buildOrderDetails({...input,cart:[{id:'demo-sandia',quantity:2}]},previous));
   } finally {strain.available=available;}
 });
+
+test('sold-out Plantz selections reject new reservations and increases while retaining saved order lines',()=>{
+  for(const id of ['bakerz-dozen-plantz','lemon-zoap-plantz']) {
+    const offer=seedOffers.find(offer=>offer.strain===id)!;
+    const cart=[{id:offer.id,quantity:1}];
+    assert.equal(isOfferAvailable(offer),false);
+    assert.throws(()=>buildPublicOrderDetails({...input,cart,terms:true,policyVersion:POLICY_VERSION}),/unavailable/);
+    const previous={...buildOrderDetails(input),items:[{id:offer.id,strain:id,name:strains.find(strain=>strain.id===id)!.name,pack:'10 seeds per pack',quantity:1,unitCents:6000}],shipping:1000,total:7000} as Order;
+    const retained=buildOrderDetails({...input,cart},previous);
+    assert.deepEqual(retained.items,previous.items);
+    assert.equal(retained.total,7000);
+    assert.throws(()=>buildOrderDetails({...input,cart:[{id:offer.id,quantity:2}]},previous),/no longer available/);
+  }
+});
 test('retired offer snapshots can be retained or removed without catalog lookup',()=>{
   const original=buildOrderDetails(input);
   const previous={...original,items:[{...original.items[0],id:'retired-offer',unitCents:4200}]} as Order;
   const edit=buildOrderDetails({...input,cart:[{id:'retired-offer',quantity:1}]},previous);
-  assert.equal(edit.total,5200); assert.throws(()=>buildOrderDetails({...input,cart:[{id:'retired-offer',quantity:2}]},previous));
+  assert.equal(edit.total,5700); assert.throws(()=>buildOrderDetails({...input,cart:[{id:'retired-offer',quantity:2}]},previous));
 });
 test('catalog price changes do not reprice an existing order',()=>{
   const original=buildOrderDetails(input);
-  const previous={...original,items:[{...original.items[0],unitCents:6500}],subtotal:6500,total:7500} as Order;
-  assert.equal(buildOrderDetails(input).total,7000);
+  const previous={...original,shipping:1000,items:[{...original.items[0],unitCents:6500}],subtotal:6500,total:7500} as Order;
+  assert.equal(buildOrderDetails(input).total,7500);
   const edit=buildOrderDetails(input,previous);
   assert.equal(edit.items[0].unitCents,6500);
   assert.equal(edit.total,7500);
 });
 test('checkout accepts one pack of every available variety at the $60 price',()=>{
   const order=buildOrderDetails({...input,cart:seedOffers.filter(isOfferAvailable).map(offer=>({id:offer.id,quantity:1}))});
-  assert.equal(order.items.length,18);
+  assert.equal(order.items.length,16);
   assert.ok(order.items.every(item=>item.unitCents===6000));
-  assert.equal(order.subtotal,108000);
-  assert.equal(order.total,109000);
+  assert.equal(order.subtotal,96000);
+  assert.equal(order.total,97500);
 });
 
-test('shipping defaults to $10, expedited is $30 total, and client prices are ignored',()=>{
-  assert.equal(buildOrderDetails(input).shipping,1000);
+test('shipping defaults to $15, expedited is $30 total, and client prices are ignored',()=>{
+  assert.equal(buildOrderDetails(input).shipping,1500);
+  const legacy={...buildOrderDetails(input),shipping:1000,total:7000} as Order;
+  assert.equal(buildOrderDetails(input,legacy).shipping,1000);
   const expedited=buildOrderDetails({...input,shippingMethod:'expedited',shipping:1,total:1});
   assert.equal(expedited.shipping,3000);
   assert.equal(expedited.total,9000);

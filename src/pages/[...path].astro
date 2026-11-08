@@ -18,7 +18,7 @@ export function getStaticPaths() {
 }
 interface Props { locale: Locale; page: Page; slug: string }
 const { locale, page, slug } = Astro.props; const t = ui(locale);
-const titles: Record<Page, string> = { home: 'Wolf House Farms', genetics: t.genetics, strain: page === 'strain' ? getStrain(slug).name : '', work: t.work, project: page === 'project' ? getProject(slug).name : '', story: t.story, checkout: t.cart, confirmation: t.confirmationLabel, contact: t.contact, ...policyUI[locale] };
+const titles: Record<Page, string> = { home: 'Wolf House Genetics', genetics: t.genetics, strain: page === 'strain' ? getStrain(slug).name : '', work: t.work, project: page === 'project' ? getProject(slug).name : '', story: t.story, checkout: t.cart, confirmation: t.confirmationLabel, contact: t.contact, ...policyUI[locale] };
 ---
 <SiteLayout locale={locale} page={page} slug={slug} title={titles[page]} description={page === 'strain' ? getStrain(slug).description[locale] : undefined}>
   {page === 'home' && <Home locale={locale}/>}

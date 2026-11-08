@@ -23,7 +23,7 @@ try {
   }
   const submissions=await Promise.all([send('/api/orders/',payload),send('/api/orders/',payload)]);
   const receipts=await Promise.all(submissions.map(async r=>{const body=await r.json();assert.equal(r.status,201,JSON.stringify(body));return body.confirmation;}));
-  assert.deepEqual(receipts[0],receipts[1]); assert.equal(receipts[0].total,7000);
+  assert.deepEqual(receipts[0],receipts[1]); assert.equal(receipts[0].total,7500);
   const saved=await db.from('whf_orders').select('id,version,items,customer,payment,shipping',{count:'exact'}).eq('request_id',requestId); assert.ifError(saved.error); assert.equal(saved.count,1); orderId=saved.data[0].id;
   const cashPayload={...payload,requestId:cashRequestId,payment:{method:'cash',account:''}};
   const cashResponses=await Promise.all([send('/api/orders/',cashPayload),send('/api/orders/',cashPayload)]);
@@ -32,7 +32,7 @@ try {
   const cashSaved=await db.from('whf_orders').select('id,payment,payment_status',{count:'exact'}).eq('request_id',cashRequestId);assert.ifError(cashSaved.error);assert.equal(cashSaved.count,1);cashOrderId=cashSaved.data[0].id;
   assert.deepEqual(cashSaved.data[0].payment,cashPayload.payment);assert.equal(cashSaved.data[0].payment_status,'pending');
   const created=await db.auth.admin.createUser({email,password,email_confirm:true}); assert.ifError(created.error); userId=created.data.user.id;
-  const denied=await login(); assert.equal(denied.status,200); assert.match(await denied.text(),/does not have WHF admin access/);
+  const denied=await login(); assert.equal(denied.status,200); assert.match(await denied.text(),/does not have Wolf House Genetics admin access/);
   assert.ifError((await db.from('whf_admins').insert({user_id:userId})).error);
   const signedIn=await login(); assert.equal(signedIn.status,303); const cookie=signedIn.headers.getSetCookie().map(v=>v.split(';')[0]).join('; '); assert.match(cookie,/sb-/);
   assert.ok(signedIn.headers.getSetCookie().every(v=>/HttpOnly/i.test(v)));
