@@ -241,7 +241,7 @@ export function formatLineage(strain: Pick<Strain, "mother" | "father" | "suppli
 }
 export const getProject = (id: string) => projects.find((p) => p.id === id)!;
 export const getStrain = (id: string) => strains.find((s) => s.id === id)!;
-export const PACK_PRICE_CENTS = 6000;
+export const PACK_PRICE_CENTS = 5000;
 export const MAX_PACKS_PER_VARIETY = 2;
 export const SHIPPING_CENTS = 1500;
 export const pollenOffer = {

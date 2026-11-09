@@ -89,7 +89,7 @@ for (const file of pages) {
     const strain=getStrain(relative.split('/').at(-2));
     if(getAvailableOffer(strain.id)) {
       assert.match(html,/data-add-offer=/,`${file}: available variety cannot be ordered`);
-      assert.match(html,/(?:\$|USD\s*)60\.00/,`${file}: pack must cost $60`);
+      assert.match(html,/(?:\$|USD\s*)50\.00/,`${file}: pack must cost $50`);
     } else {
       assert.doesNotMatch(html,/data-add-offer=/,`${file}: unavailable variety must not be orderable`);
       assert.match(html,strain.status === 'coming-soon' ? /Coming soon|Próximamente/ : /Out of stock|Agotado/,`${file}: availability status is missing`);

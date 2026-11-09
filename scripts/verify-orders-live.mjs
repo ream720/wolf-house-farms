@@ -23,7 +23,7 @@ try {
   }
   const submissions=await Promise.all([send('/api/orders/',payload),send('/api/orders/',payload)]);
   const receipts=await Promise.all(submissions.map(async r=>{const body=await r.json();assert.equal(r.status,201,JSON.stringify(body));return body.confirmation;}));
-  assert.deepEqual(receipts[0],receipts[1]); assert.equal(receipts[0].total,7500);
+  assert.deepEqual(receipts[0],receipts[1]); assert.equal(receipts[0].total,6500);
   const saved=await db.from('whf_orders').select('id,version,items,customer,payment,shipping',{count:'exact'}).eq('request_id',requestId); assert.ifError(saved.error); assert.equal(saved.count,1); orderId=saved.data[0].id;
   const cashPayload={...payload,requestId:cashRequestId,payment:{method:'cash',account:''}};
   const cashResponses=await Promise.all([send('/api/orders/',cashPayload),send('/api/orders/',cashPayload)]);

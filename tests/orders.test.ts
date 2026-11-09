@@ -64,7 +64,7 @@ test('server validates bounded US contact details',()=>{
 });
 test('order totals and item snapshots come from trusted catalog data',()=>{
   const details=buildOrderDetails({...input,subtotal:1,total:1,cart:[{id:'demo-sandia',quantity:2,unitCents:1,name:'forged'}]});
-  assert.equal(details.total,13500); assert.equal(details.items[0].name,'La Sandía'); assert.equal(details.items[0].unitCents,6000);
+  assert.equal(details.total,11500); assert.equal(details.items[0].name,'La Sandía'); assert.equal(details.items[0].unitCents,5000);
   for(const cart of [[],[{id:'unknown',quantity:1}],[{id:'demo-sandia',quantity:3}],[{id:'demo-sandia',quantity:1.5}],[{id:'demo-sandia',quantity:1},{id:'demo-sandia',quantity:1}],[{id:'demo-sandia',quantity:0}]]) assert.throws(()=>buildOrderDetails({...input,cart}));
 });
 test('unavailable items are rejected, while existing order lines retain agreed prices',()=>{
@@ -73,7 +73,7 @@ test('unavailable items are rejected, while existing order lines retain agreed p
   try {
     strain.available=false;
     assert.throws(()=>buildOrderDetails(input));
-    const edit=buildOrderDetails(input,previous); assert.equal(edit.items[0].unitCents,6000); assert.equal(edit.shipping,850);
+    const edit=buildOrderDetails(input,previous); assert.equal(edit.items[0].unitCents,5000); assert.equal(edit.shipping,850);
     assert.throws(()=>buildOrderDetails({...input,cart:[{id:'demo-sandia',quantity:2}]},previous));
   } finally {strain.available=available;}
 });
@@ -100,17 +100,17 @@ test('retired offer snapshots can be retained or removed without catalog lookup'
 test('catalog price changes do not reprice an existing order',()=>{
   const original=buildOrderDetails(input);
   const previous={...original,shipping:1000,items:[{...original.items[0],unitCents:6500}],subtotal:6500,total:7500} as Order;
-  assert.equal(buildOrderDetails(input).total,7500);
+  assert.equal(buildOrderDetails(input).total,6500);
   const edit=buildOrderDetails(input,previous);
   assert.equal(edit.items[0].unitCents,6500);
   assert.equal(edit.total,7500);
 });
-test('checkout accepts one pack of every available variety at the $60 price',()=>{
+test('checkout accepts one pack of every available variety at the $50 price',()=>{
   const order=buildOrderDetails({...input,cart:seedOffers.filter(isOfferAvailable).map(offer=>({id:offer.id,quantity:1}))});
   assert.equal(order.items.length,16);
-  assert.ok(order.items.every(item=>item.unitCents===6000));
-  assert.equal(order.subtotal,96000);
-  assert.equal(order.total,97500);
+  assert.ok(order.items.every(item=>item.unitCents===5000));
+  assert.equal(order.subtotal,80000);
+  assert.equal(order.total,81500);
 });
 
 test('shipping defaults to $15, expedited is $30 total, and client prices are ignored',()=>{
@@ -119,7 +119,7 @@ test('shipping defaults to $15, expedited is $30 total, and client prices are ig
   assert.equal(buildOrderDetails(input,legacy).shipping,1000);
   const expedited=buildOrderDetails({...input,shippingMethod:'expedited',shipping:1,total:1});
   assert.equal(expedited.shipping,3000);
-  assert.equal(expedited.total,9000);
+  assert.equal(expedited.total,8000);
   assert.match(shippingLabel(expedited.shipping),/Expedited/);
   assert.match(shippingLabel(expedited.shipping,'es'),/exprés/);
   assert.equal(buildOrderDetails({...input,shippingMethod:'standard'},expedited as Order).shipping,3000);
@@ -130,8 +130,8 @@ test('pollen order snapshots preserve the $200 price and 2 mL units with mixed c
   const cart=[{id:pollenOffer.id,quantity:4,unitCents:1},{id:'demo-sandia',quantity:1}];
   const details=buildOrderDetails({...input,cart,shippingMethod:'expedited'});
   assert.deepEqual(details.items[0],{id:pollenOffer.id,strain:pollenOffer.strain,name:'Plantz pollen',pack:'2 mL pollen per unit',quantity:4,unitCents:20000});
-  assert.equal(details.subtotal,86000);
-  assert.equal(details.total,89000);
+  assert.equal(details.subtotal,85000);
+  assert.equal(details.total,88000);
   assert.throws(()=>buildOrderDetails({...input,cart:[{id:pollenOffer.id,quantity:5}]}),/quantity limit/);
   assert.equal(buildOrderDetails({...input,cart},details as Order).items[0].unitCents,20000);
 });
