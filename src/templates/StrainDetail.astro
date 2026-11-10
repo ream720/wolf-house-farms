@@ -18,7 +18,6 @@ const related = strains.filter(s => s.id !== strain.id && getCatalogLine(s).id =
     {strain.name !== lineage && <div class="lineage-record"><p>{lineage}</p></div>}
     <dl class="fact-list">
       {strain.mother && strain.father && <><div><dt>{t.mother}</dt><dd>{strain.mother}</dd></div><div><dt>{t.father}</dt><dd>{strain.father}</dd></div></>}
-      {strain.seedType && <div><dt>{t.seedType}</dt><dd>{t[strain.seedType]}</dd></div>}
       <div><dt>{t.sex}</dt><dd>{t.regular}</dd></div>
     </dl>
   </div><aside class="availability-panel" aria-label={t.cart} data-collection={line.id}>
