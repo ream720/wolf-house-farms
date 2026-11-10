@@ -20,7 +20,7 @@ interface Props { locale: Locale; page: Page; slug: string }
 const { locale, page, slug } = Astro.props; const t = ui(locale);
 const titles: Record<Page, string> = { home: 'Wolf House Genetics', genetics: t.genetics, strain: page === 'strain' ? getStrain(slug).name : '', work: t.work, project: page === 'project' ? getProject(slug).name : '', story: t.story, checkout: t.cart, confirmation: t.confirmationLabel, contact: t.contact, ...policyUI[locale] };
 ---
-<SiteLayout locale={locale} page={page} slug={slug} title={titles[page]} description={page === 'strain' ? getStrain(slug).description[locale] : undefined}>
+<SiteLayout locale={locale} page={page} slug={slug} title={titles[page]} description={page === 'strain' ? getStrain(slug).description?.[locale] || (locale === 'es' ? `${titles[page]} de Wolf House Genetics. Consulta los parentales y la disponibilidad de esta selección.` : `${titles[page]} from Wolf House Genetics. View parentage and availability for this selection.`) : undefined}>
   {page === 'home' && <Home locale={locale}/>}
   {page === 'genetics' && <Catalog locale={locale}/>}
   {page === 'work' && <Work locale={locale}/>}

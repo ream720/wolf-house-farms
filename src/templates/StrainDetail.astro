@@ -1,21 +1,19 @@
 ---
 import { ui, money, type Locale } from '../i18n/index';
 import { pathFor } from '../lib/routes';
-import { getStrain, strains, getAvailableOffer, formatLineage, getCatalogLine } from '../data/catalog';
+import { getStrain, strains, getAvailableOffer, getCatalogLine } from '../data/catalog';
 import StrainCard from '../components/StrainCard.astro';
 import Icon from '../components/Icon.astro';
 interface Props { locale: Locale; slug: string }
 const { locale, slug } = Astro.props;
 const t = ui(locale); const strain = getStrain(slug);
 const offer = getAvailableOffer(strain.id);
-const lineage = formatLineage(strain);
 const line = getCatalogLine(strain);
 const related = strains.filter(s => s.id !== strain.id && getCatalogLine(s).id === line.id).slice(0,3);
 ---
 <section class="wrap selection-detail">
   <a class="back-link" href={pathFor(locale,'genetics')}>← {t.backLibrary}</a>
-  <div class="selection-detail-grid"><div><p class="eyebrow">{t[line.label]}</p><h1>{strain.name}</h1><p class="page-lead">{strain.description[locale]}</p>
-    {strain.name !== lineage && <div class="lineage-record"><p>{lineage}</p></div>}
+  <div class="selection-detail-grid"><div><p class="eyebrow">{t[line.label]}</p><h1>{strain.name}</h1>{strain.description?.[locale] && <p class="page-lead">{strain.description[locale]}</p>}
     <dl class="fact-list">
       {strain.mother && strain.father && <><div><dt>{t.mother}</dt><dd>{strain.mother}</dd></div><div><dt>{t.father}</dt><dd>{strain.father}</dd></div></>}
       <div><dt>{t.sex}</dt><dd>{t.regular}</dd></div>
