@@ -16,8 +16,11 @@ const related = strains.filter(s => s.id !== strain.id && getCatalogLine(s).id =
   <a class="back-link" href={pathFor(locale,'genetics')}>← {t.backLibrary}</a>
   <div class="selection-detail-grid"><div><p class="eyebrow">{t[line.label]}</p><h1>{strain.name}</h1><p class="page-lead">{strain.description[locale]}</p>
     {strain.name !== lineage && <div class="lineage-record"><p>{lineage}</p></div>}
-    {strain.mother && strain.father && <dl class="fact-list"><div><dt>{t.mother}</dt><dd>{strain.mother}</dd></div><div><dt>{t.father}</dt><dd>{strain.father}</dd></div></dl>}
-    {strain.seedType && <dl class="fact-list"><div><dt>{t.seedType}</dt><dd>{t[strain.seedType]}</dd></div></dl>}
+    <dl class="fact-list">
+      {strain.mother && strain.father && <><div><dt>{t.mother}</dt><dd>{strain.mother}</dd></div><div><dt>{t.father}</dt><dd>{strain.father}</dd></div></>}
+      {strain.seedType && <div><dt>{t.seedType}</dt><dd>{t[strain.seedType]}</dd></div>}
+      <div><dt>{t.sex}</dt><dd>{t.regular}</dd></div>
+    </dl>
   </div><aside class="availability-panel" aria-label={t.cart} data-collection={line.id}>
     {offer ? <><div class="pack-summary"><div class="pack-details"><span class="pack-symbol" aria-hidden="true"><Icon name="bag" size={22}/></span><p>{t.packSize}</p></div><div class="reservation-price"><strong>{money(offer.cents,locale)}</strong><span>USD</span></div></div><button class="button" type="button" data-add-offer={offer.id}>{t.addToBag}<Icon name="bag" size={18}/></button><a class="text-link bag-panel-link" href={pathFor(locale,'checkout')}>{t.viewBag}<Icon size={17}/></a></> : <><h2>{strain.status==='coming-soon' ? t.comingSoon : t.currentlyUnavailable}</h2><p>{strain.status==='coming-soon' ? t.comingSoonHelp : t.unavailableHelp}</p><a class="button button-outline" href={pathFor(locale,'genetics')}>{t.allGenetics}<Icon/></a></>}
   </aside></div>
