@@ -72,8 +72,8 @@ const en = {
   exploreParentage: "Explore the parentage",
   parentageEyebrow: "The genetics behind the name",
   parentageTitle: "A closer look at the roots.",
-  mother: "Mother / female parent",
-  father: "Father / male parent",
+  mother: "Mother",
+  father: "Father",
   lineageAsSupplied: "Parent groups in the supplied order",
   artDirectionLabel: "Behind the illustration",
   illustrationNote:
@@ -300,8 +300,8 @@ const es: typeof en = {
   exploreParentage: "Explorar los parentales",
   parentageEyebrow: "La genética detrás del nombre",
   parentageTitle: "Una mirada a las raíces.",
-  mother: "Madre / parental femenino",
-  father: "Padre / parental masculino",
+  mother: "Madre",
+  father: "Padre",
   lineageAsSupplied: "Grupos parentales en el orden proporcionado",
   artDirectionLabel: "Detrás de la ilustración",
   illustrationNote:

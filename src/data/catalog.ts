@@ -116,10 +116,10 @@ export const strains: Strain[] = [
     name: "Spanish Blue",
     number: "04",
     image: "spanish-blue",
-    mother: "Gary Payton × Gary Payton",
+    mother: "Gary Payton S1",
     father,
     suppliedLineage:
-      "((Cherry Runtz × BloodBerry Rain) × (Gary Payton × Gary Payton))",
+      "((Cherry Runtz × BloodBerry Rain) × (Gary Payton S1))",
     seedType: "hybridRegular",
     status: "current",
     source: "supplied-artwork",

@@ -3,6 +3,7 @@ import { ui, money, type Locale } from '../i18n/index';
 import { pathFor } from '../lib/routes';
 import { getStrain, strains, getAvailableOffer, getCatalogLine } from '../data/catalog';
 import StrainCard from '../components/StrainCard.astro';
+import Lineage from '../components/Lineage.astro';
 import Icon from '../components/Icon.astro';
 interface Props { locale: Locale; slug: string }
 const { locale, slug } = Astro.props;
@@ -13,12 +14,17 @@ const related = strains.filter(s => s.id !== strain.id && getCatalogLine(s).id =
 ---
 <section class="wrap selection-detail">
   <a class="back-link" href={pathFor(locale,'genetics')}>← {t.backLibrary}</a>
-  <div class="selection-detail-grid"><div><p class="eyebrow">{t[line.label]}</p><h1>{strain.name}</h1>{strain.description?.[locale] && <p class="page-lead">{strain.description[locale]}</p>}
-    <dl class="fact-list">
-      {strain.mother && strain.father && <><div><dt>{t.mother}</dt><dd>{strain.mother}</dd></div><div><dt>{t.father}</dt><dd>{strain.father}</dd></div></>}
-      <div><dt>{t.sex}</dt><dd>{t.regular}</dd></div>
-    </dl>
-  </div><aside class="availability-panel" aria-label={t.cart} data-collection={line.id}>
+  <div class="selection-detail-grid">
+    <div class="selection-content">
+      <header class="selection-heading">
+        <p class="eyebrow">{t[line.label]}</p>
+        <h1>{strain.name}</h1>
+        <p class="selection-subtitle">{t.regular}</p>
+        {strain.description?.[locale] && <p class="page-lead">{strain.description[locale]}</p>}
+      </header>
+    {strain.mother && strain.father && <Lineage mother={strain.mother} father={strain.father} name={strain.name} locale={locale}/>}
+    </div>
+    <aside class="availability-panel" aria-label={t.cart} data-collection={line.id}>
     {offer ? <><div class="pack-summary"><div class="pack-details"><span class="pack-symbol" aria-hidden="true"><Icon name="bag" size={22}/></span><p>{t.packSize}</p></div><div class="reservation-price"><strong>{money(offer.cents,locale)}</strong><span>USD</span></div></div><button class="button" type="button" data-add-offer={offer.id}>{t.addToBag}<Icon name="bag" size={18}/></button><a class="text-link bag-panel-link" href={pathFor(locale,'checkout')}>{t.viewBag}<Icon size={17}/></a></> : <><h2>{strain.status==='coming-soon' ? t.comingSoon : t.currentlyUnavailable}</h2><p>{strain.status==='coming-soon' ? t.comingSoonHelp : t.unavailableHelp}</p><a class="button button-outline" href={pathFor(locale,'genetics')}>{t.allGenetics}<Icon/></a></>}
   </aside></div>
 </section>

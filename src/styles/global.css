@@ -2398,10 +2398,16 @@ body::before { display: none; }
 .roots-hero .button { margin-top: 24px; }
 .catalog-search-collection { grid-template-columns: minmax(0,2fr) minmax(200px,1fr) auto; }
 select option { background: #1d1d22; }
-.selection-detail { padding-block: 36px 70px; }
+.selection-detail { padding-block: 28px 64px; }
+.selection-detail > .back-link { margin-bottom: 28px; color: var(--muted); }
+.selection-detail > .back-link:hover { color: var(--ink); }
 .selection-detail-grid { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(0,1fr); gap: 70px; align-items: start; }
-.selection-detail h1 { font-size: clamp(48px,5.7vw,78px); overflow-wrap: anywhere; margin-top: 22px; }
-.selection-detail .eyebrow { color: var(--marigold); }
+.selection-content { min-width: 0; }
+.selection-heading > .eyebrow { color: var(--marigold); max-width: 48ch; }
+.selection-detail h1 { font-size: clamp(44px,5.5vw,76px); line-height: 1.04; overflow-wrap: anywhere; text-wrap: balance; margin-top: 14px; }
+.selection-subtitle { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--muted); font: 400 14px/1.5 var(--sans); letter-spacing: .04em; }
+.selection-subtitle::before { content: ''; width: 20px; height: 1px; background: var(--line); }
+.selection-heading .page-lead { max-width: 48ch; margin-top: 20px; font-size: 15px; }
 .availability-panel {
   --panel-accent: var(--olive);
   position: relative;
@@ -2469,6 +2475,10 @@ select option { background: #1d1d22; }
  .selection-detail-grid { gap: 32px; }
  .compact-catalog { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
+@media(max-width:900px) {
+ .selection-detail-grid { grid-template-columns: 1fr; gap: 32px; }
+ .selection-detail .availability-panel { max-width: none; margin-top: 0; }
+}
 @media(max-width:600px) {
  .wrap { width: calc(100% - 40px); }
  .site-header { height: 88px; gap: 12px; }
@@ -2491,8 +2501,9 @@ select option { background: #1d1d22; }
  .catalog-search-collection { grid-template-columns: 1fr; gap: 18px; }
  .catalog-search-collection .clear-filter { grid-column: 1; }
  .selection-detail-grid { grid-template-columns: 1fr; gap: 28px; }
- .selection-detail h1 { font-size: 48px; }
- .selection-detail { padding-bottom: 45px; }
+ .selection-detail h1 { font-size: clamp(40px,10vw,48px); }
+ .selection-detail { padding-block: 20px 48px; }
+ .selection-detail > .back-link { margin-bottom: 20px; }
  .availability-panel { padding: 22px; max-width: none; margin-top: 0; }
  .age-gate { padding: 16px; }
  .age-card { padding: 22px; }

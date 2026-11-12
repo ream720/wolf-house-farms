@@ -1,0 +1,46 @@
+---
+import { ui, type Locale } from '../i18n/index';
+interface Props { mother: string; father: string; name: string; locale: Locale }
+const { mother, father, name, locale } = Astro.props;
+const t = ui(locale);
+---
+<figure class="lineage-tree">
+  <figcaption class="eyebrow">{t.lineage}</figcaption>
+  <div class="lineage-parents">
+    <div class="lineage-parent lineage-mother">
+      <span class="lineage-role">{t.mother}</span>
+      <p>{mother}</p>
+    </div>
+    <span class="lineage-cross" aria-hidden="true">×</span>
+    <div class="lineage-parent lineage-father">
+      <span class="lineage-role">{t.father}</span>
+      <p>{father}</p>
+    </div>
+  </div>
+  <div class="lineage-branches" aria-hidden="true"></div>
+  <p class="lineage-selection"><span class="sr-only">{locale === 'es' ? 'Selección resultante: ' : 'Resulting selection: '}</span>{name}</p>
+</figure>
+
+<style>
+  .lineage-tree { --parent-gap: 40px; margin: 36px 0 0; padding-top: 24px; border-top: 1px solid var(--line); }
+  .lineage-tree figcaption { margin-bottom: 20px; color: var(--muted); }
+  .lineage-parents { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--parent-gap); position: relative; }
+  .lineage-parent { --parent-accent: var(--olive); padding: 20px 16px 24px; border-top: 1px solid var(--parent-accent); background: linear-gradient(var(--paper-light), transparent); min-width: 0; text-align: center; }
+  .lineage-father { --parent-accent: var(--rust); }
+  .lineage-role { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font: 500 12px/1.5 var(--sans); }
+  .lineage-role::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--parent-accent); }
+  .lineage-parent p { margin: 12px 0 0; font: 500 clamp(22px,2.1vw,28px)/1.25 var(--serif); overflow-wrap: anywhere; text-wrap: balance; }
+  .lineage-cross { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); font: 400 22px/1 var(--sans); color: var(--muted); }
+  .lineage-branches { position: relative; height: 40px; }
+  .lineage-branches::before { content: ''; position: absolute; inset: 0 calc((100% - var(--parent-gap)) / 4) auto; height: 20px; border: 1px solid var(--muted); border-top: 0; }
+  .lineage-branches::after { content: ''; position: absolute; left: 50%; top: 20px; height: 20px; border-left: 1px solid var(--muted); }
+  .lineage-selection { width: fit-content; max-width: 100%; margin: 0 auto; padding: 12px 20px 0; text-align: center; font: 500 clamp(24px,2.2vw,30px)/1.2 var(--serif); overflow-wrap: anywhere; text-wrap: balance; }
+  @media (max-width: 600px) {
+    .lineage-tree { --parent-gap: 24px; margin-top: 28px; padding-top: 20px; }
+    .lineage-tree figcaption { margin-bottom: 16px; }
+    .lineage-parent { padding: 16px 8px 20px; }
+    .lineage-parent p { font-size: 22px; }
+    .lineage-cross { font-size: 18px; }
+    .lineage-selection { font-size: 24px; padding-inline: 12px; }
+  }
+</style>

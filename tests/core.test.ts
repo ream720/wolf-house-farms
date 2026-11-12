@@ -152,7 +152,7 @@ test("supplied artwork parent roles and limited seed-type evidence are preserved
     byId["albany-chocolate"].mother,
     "Jealousy × Apples and Bananas",
   );
-  assert.equal(byId["spanish-blue"].mother, "Gary Payton × Gary Payton");
+  assert.equal(byId["spanish-blue"].mother, "Gary Payton S1");
   assert.equal(byId["la-sandia"].seedType, undefined);
   assert.equal(byId["cherry-zushi"].seedType, undefined);
   assert.equal(byId["albany-chocolate"].seedType, "hybridRegular");
@@ -195,7 +195,7 @@ test("public pedigrees consistently group the female parent before the male pare
     "(Watermelon Sugaree x Grape Rainbow Pie) x (Cherry Runtz x BloodBerry Rain)",
     "(Zkittlez x Kush Mints) x (Cherry Runtz x BloodBerry Rain)",
     "(Jealousy x Apples and Bananas) x (Cherry Runtz x BloodBerry Rain)",
-    "(Gary Payton x Gary Payton) x (Cherry Runtz x BloodBerry Rain)",
+    "Gary Payton S1 x (Cherry Runtz x BloodBerry Rain)",
     "(Garlic Juice x Grape Rainbow Pie) x (Cherry Runtz x BloodBerry Rain)",
     "Sweet Jealousy x Cherry Boo Berries",
     "Rainbow Juice x Cherry Boo Berries",
